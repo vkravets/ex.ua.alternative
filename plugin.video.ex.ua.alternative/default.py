@@ -200,6 +200,7 @@ def video_item(video_url):
 ##                except ValueError:
 ##                    pass
             listing.append(item)
+        # Switch view based on a current skin.
         current_skin = xbmc.getSkinDir()
         if current_skin == 'skin.confluence' or current_skin == 'skin.confluence-plood':
             view_mode = 503

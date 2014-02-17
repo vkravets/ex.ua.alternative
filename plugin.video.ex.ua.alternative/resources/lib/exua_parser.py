@@ -130,7 +130,7 @@ def get_video_details(url):
     soup = BeautifulSoup(web_page)
     if u'Артисты @ EX.UA' in soup.find('title').text:
         details['title'] = soup.find('meta', {'name': 'title'})['content']
-        details['plot'] = soup.find('div', id="content_page").text
+        details['plot'] = soup.find('div', id="content_page").get_text(' ', strip=True)
         details['thumb'] = soup.find('link', rel='image_src')['href']
         video_url = re.search('playlist: \[ \"(.*?)\" \]',
                         soup.find('script', {'type':'text/javascript'}, text=re.compile('playlist')).text).group(1)
@@ -167,8 +167,8 @@ def get_video_details(url):
                     'genre': [u'Жанр.*', u'Жанр.*?: *?(.*)', '.*'],
                     'director': [u'[Рр]ежисс?[её]р.*', u'[Рр]ежисс?[её]р.*?: *?(.*)', '(.*)'],
                     'duration': [u'Продолжительность.*', u'Продолжительность.*?: *?(.*)', '(.*)'],
-                    'plot': [u'(?:[Оо]писание|О фильме|Сюжет|О чем|[Сс]одержание|О сериале).*',
-                                u'(?:[Оо]писание|О фильме|Сюжет|О чем|[Сс]одержание|О сериале).*?: *?(.*)', '(.*)'],
+                    'plot': [u'(?:[Оо]писание|О фильме|Сюжет|О чем|О сериале).*',
+                                u'(?:[Оо]писание|О фильме|Сюжет|О чем|О сериале).*?: *?(.*)', '(.*)'],
                     'cast': [u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '.*'],
                     }
         for detail in DETAILS.keys():
@@ -193,9 +193,9 @@ def get_video_details(url):
                 text = ''
             details[detail] = text.replace(': ', '')
         if not details['plot']:
-            meta_content = soup.find('meta', {'name': 'description'})
-            if meta_content is not None:
-                details['plot'] = meta_content['content']
+            plot_tags = soup.find('span', {'class': 'modify_time'}).find_next('p')
+            if plot_tags is not None:
+                details['plot'] = plot_tags.get_text(' ', strip=True).replace(u'смотреть онлайн', '')
     return details
 
 
@@ -208,9 +208,9 @@ def main():
 ##    for video in videos['videos']:
 ##        i += 1
 ##        print video, i
-##    details = get_video_details('/6048?r=1988,23775')
-##    for key in details.keys():
-##        print key + ': ', details[key]
+    details = get_video_details('/76265067?r=2,23775')
+    for key in details.keys():
+        print key + ': ', details[key]
 
 if __name__ == '__main__':
     main()
