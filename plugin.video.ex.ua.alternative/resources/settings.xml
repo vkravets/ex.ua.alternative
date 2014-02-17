@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <category label="128">
+    <setting id="prefer_lq" type="bool"
+        label="Предпочитать облегченное видео (при наличии)" default="false"/>
+    <setting id="itemcount" type="enum" values="25|50|75|100"
+        label="Количество элементов на странице" default = "0"/>
+    <setting type="action"
+        label="Очистить кэш страниц" action="RunScript($CWD/resources/lib/clear_history.py,cache)" />
+    <setting id="savesearch" type="bool"
+        label="Сохранять историю поиска" default="true"/>
+    <setting id="historylength" type="enum" values="5|10|15|20|25"
+        label="Длина истории поиска" enable="eq(-1,true)" default = "1"/>
+        <setting type="action"
+        label="Очистить историю поиска" action="RunScript($CWD/resources/lib/clear_history.py,history)" />
+  </category>
+</settings>
