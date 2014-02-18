@@ -9,30 +9,10 @@ import socket
 import re
 import ast
 from bs4 import BeautifulSoup
-
+import webbot
 
 SITE = 'http://www.ex.ua'
-HEADER = {  'User-Agent'        :   'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
-            'Host'              :   SITE[7:],
-            'Accept'            :   'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Charset'    :   'UTF-8'}
-
-
-def get_page(url):
-    """
-    Load a web-page with provided url.
-    Return a loaded page or an empty string in case of a network error.
-    """
-    request = urllib2.Request(url, None, HEADER)
-    try:
-        session = urllib2.urlopen(request, None, 5)
-    except (urllib2.URLError, socket.timeout):
-        page = ''
-    else:
-        page = session.read().decode('utf-8')
-        session.close()
-    return page
-
+loader = webbot.WebBot()
 
 def get_categories():
     """
@@ -42,7 +22,7 @@ def get_categories():
         url
         items# (items count)
     """
-    web_page = get_page('http://www.ex.ua/ru/video')
+    web_page = loader.get_page('http://www.ex.ua/ru/video')
     CAT_PATTERN = '<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>'
     parse = re.findall(CAT_PATTERN, web_page, re.UNICODE)
     categories = []
@@ -70,7 +50,7 @@ def get_videos(category_url, page=0, pages='25'):
         pageNo = '&p=' + str(page)
     else:
         pageNo = ''
-    web_page = get_page(SITE + category_url + pageNo + '&per=' + pages)
+    web_page = loader.get_page(SITE + category_url + pageNo + '&per=' + pages)
     soup = BeautifulSoup(web_page)
     videos = []
     content_table = soup.find('table', cellspacing='8')
@@ -126,7 +106,7 @@ def get_video_details(url):
     """
     details = {}
     details['videos'] = []
-    web_page = get_page(SITE + url)
+    web_page = loader.get_page(SITE + url)
     soup = BeautifulSoup(web_page)
     if u'Артисты @ EX.UA' in soup.find('title').text:
         details['title'] = soup.find('meta', {'name': 'title'})['content']
