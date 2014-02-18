@@ -5,7 +5,6 @@
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
 import urllib2
-import socket
 import re
 import ast
 from bs4 import BeautifulSoup
@@ -26,7 +25,7 @@ def get_page(url):
     request = urllib2.Request(url, None, HEADER)
     try:
         session = urllib2.urlopen(request, None, 5)
-    except (urllib2.URLError, socket.timeout):
+    except urllib2.URLError:
         page = ''
     else:
         page = session.read().decode('utf-8')
@@ -95,12 +94,12 @@ def get_videos(category_url, page=0, pages='25'):
         if nav_table is not None:
             prev_tag = nav_table.find('img', alt=re.compile(u'предыдущую', re.UNICODE))
             if prev_tag is not None:
-                prev_page = prev_tag.find_previous('a', text=re.compile(u'..')).text
+                prev_page = prev_tag.find_previous('a', text=re.compile(u'\.\.')).text
             else:
                 prev_page = ''
             next_tag = nav_table.find('img', alt=re.compile(u'следующую', re.UNICODE))
             if next_tag is not None:
-                next_page = next_tag.find_next('a', text=re.compile(u'..')).text
+                next_page = next_tag.find_next('a', text=re.compile(u'\.\.')).text
             else:
                 next_page = ''
         else:
