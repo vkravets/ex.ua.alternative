@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 SITE = 'http://www.ex.ua'
 HEADER = {  'User-Agent'        :   'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
             'Host'              :   SITE[7:],
-            'Referer'           :   SITE,
+            'Accept'            :   'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Charset'    :   'UTF-8'}
 
 
@@ -203,14 +203,7 @@ def main():
     """
     For testing only.
     """
-##    videos = get_videos('/ru/video/foreign?r=23775')
-##    i = 0
-##    for video in videos['videos']:
-##        i += 1
-##        print video, i
-    details = get_video_details('/76265067?r=2,23775')
-    for key in details.keys():
-        print key + ': ', details[key]
+    pass
 
 if __name__ == '__main__':
     main()
