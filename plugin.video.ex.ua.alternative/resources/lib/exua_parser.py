@@ -77,12 +77,12 @@ def get_videos(category_url, page=0, pages='25'):
         if nav_table is not None:
             prev_tag = nav_table.find('img', alt=re.compile(u'предыдущую', re.UNICODE))
             if prev_tag is not None:
-                prev_page = prev_tag.find_previous('a', text=re.compile(u'/./.')).text
+                prev_page = prev_tag.find_previous('a', text=re.compile(u'\.\.')).text
             else:
                 prev_page = ''
             next_tag = nav_table.find('img', alt=re.compile(u'следующую', re.UNICODE))
             if next_tag is not None:
-                next_page = next_tag.find_next('a', text=re.compile(u'/./.')).text
+                next_page = next_tag.find_next('a', text=re.compile(u'\.\.')).text
             else:
                 next_page = ''
         else:
