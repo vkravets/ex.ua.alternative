@@ -87,7 +87,7 @@ class WebBot(object):
             captcha_id = captcha_group.group(1)
             captcha_file = os.path.join(_cookie_dir, 'captcha.png')
             xbmcvfs.delete(captcha_file)
-            urllib.urlretrieve('http://www.ex.ua/captcha\?captcha_id=' + captcha_id, captcha_file)
+            urllib.urlretrieve('http://www.ex.ua/captcha?captcha_id=' + captcha_id, captcha_file)
             captcha = {'captcha_id': captcha_id, 'captcha_file': captcha_file}
         else:
             captcha = {}
