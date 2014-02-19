@@ -145,12 +145,12 @@ def get_video_details(url):
         else:
             details['flvs'] = ''
         DETAILS = {
-                    'year': [u'(?:Год|Рік).*', u'(?:Год|Рік).*?: *?([0-9]{4})', '([0-9]{4})'],
-                    'genre': [u'Жанр.*', u'Жанр.*?: *?(.*)', '.*'],
+                    'year': [u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]ік).*?: *?([0-9]{4})', '([0-9]{4})'],
+                    'genre': [u'[Жж]анр.*', u'[Жж]анр.*?: *?(.*)', '.*'],
                     'director': [u'[Рр]ежисс?[её]р.*', u'[Рр]ежисс?[её]р.*?: *?(.*)', '(.*)'],
-                    'duration': [u'Продолжительность.*', u'Продолжительность.*?: *?(.*)', '(.*)'],
-                    'plot': [u'(?:[Оо]писание|О фильме|Сюжет|О чем|О сериале).*',
-                                u'(?:[Оо]писание|О фильме|Сюжет|О чем|О сериале).*?: *?(.*)', '(.*)'],
+                    'duration': [u'[Пп]родолжительность.*', u'[Пп]родолжительность.*?: *?(.*)', '(.*)'],
+                    'plot': [u'(?:[Оо]писание|[Оо] фильме|[Сс]южет|[Оо] чем|[Оо] сериале).*',
+                                u'(?:[Оо]писание|[Оо] фильме|[Сс]южет|[Оо] чем|[Оо] сериале).*?: *?(.*)', '(.*)'],
                     'cast': [u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '.*'],
                     }
         for detail in DETAILS.keys():
@@ -175,9 +175,9 @@ def get_video_details(url):
                 text = ''
             details[detail] = text.replace(': ', '')
         if not details['plot']:
-            plot_tags = soup.find('span', {'class': 'modify_time'}).find_next('p')
+            plot_tags = soup.find('span', {'class': 'modify_time'})
             if plot_tags is not None:
-                details['plot'] = plot_tags.get_text(' ', strip=True).replace(u'смотреть онлайн', '')
+                details['plot'] = plot_tags.find_next('p').get_text(' ', strip=True).replace(u'смотреть онлайн', '')
     return details
 
 
