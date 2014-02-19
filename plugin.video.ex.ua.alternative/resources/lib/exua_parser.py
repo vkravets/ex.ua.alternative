@@ -4,11 +4,10 @@
 # Created:     04.02.2014
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
-import urllib2
-import socket
 import re
 import ast
 from bs4 import BeautifulSoup
+import xbmc
 import webbot
 
 SITE = 'http://www.ex.ua'
@@ -50,7 +49,11 @@ def get_videos(category_url, page=0, pages='25'):
         pageNo = '&p=' + str(page)
     else:
         pageNo = ''
-    web_page = loader.get_page(SITE + category_url + pageNo + '&per=' + pages)
+    if category_url == '/buffer':
+        page_count = ''
+    else:
+        page_count = '&per=' + pages
+    web_page = loader.get_page(SITE + category_url + pageNo + page_count)
     soup = BeautifulSoup(web_page)
     videos = []
     content_table = soup.find('table', cellspacing='8')
@@ -75,12 +78,12 @@ def get_videos(category_url, page=0, pages='25'):
         if nav_table is not None:
             prev_tag = nav_table.find('img', alt=re.compile(u'предыдущую', re.UNICODE))
             if prev_tag is not None:
-                prev_page = prev_tag.find_previous('a', text=re.compile(u'..')).text
+                prev_page = prev_tag.find_previous('a', text=re.compile(u'/./.')).text
             else:
                 prev_page = ''
             next_tag = nav_table.find('img', alt=re.compile(u'следующую', re.UNICODE))
             if next_tag is not None:
-                next_page = next_tag.find_next('a', text=re.compile(u'..')).text
+                next_page = next_tag.find_next('a', text=re.compile(u'/./.')).text
             else:
                 next_page = ''
         else:
@@ -183,7 +186,8 @@ def main():
     """
     For testing only.
     """
-    pass
+    videos = get_videos('/buffer')
+    print videos
 
 if __name__ == '__main__':
     main()

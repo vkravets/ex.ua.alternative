@@ -60,6 +60,10 @@ icons = os.path.join(addon_path, 'resources', 'icons')
 # Import custom module.
 sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
+import webbot
+import login_window
+# Create login bot instance.
+login_bot = webbot.WebBot()
 # Create persistent storage for history.
 storage = plugin.get_storage('storage')
 if plugin.addon.getSetting('savesearch') == 'true':
@@ -96,7 +100,11 @@ def list_videos(path, page_No, mode):
     listing = []
     page = int(page_No)
     pages = {'0': '25', '1': '50', '2': '75', '3': '100'}[plugin.addon.getSetting('itemcount')]
-    videos = get_videos(path, page, pages)
+    if path == '/buffer':
+        videos = exua_parser.get_videos(path, page, pages)
+    else:
+        videos = get_videos(path, page, pages)
+##    _log('bookmarked videos', videos)
     if videos['videos']:
         if page or mode == 'search':
             listing.append({'label': u'<< Главная',
@@ -136,6 +144,16 @@ def categories():
         listing.append({'label': u'[История поиска]',
                         'path': plugin.url_for('search_history'),
                         'thumbnail': os.path.join(icons, 'search.png')})
+    if plugin.addon.getSetting('authorization') == 'true':
+        if login_bot.is_logged_in():
+            label = u'[Мои закладки]'
+            thumbnail = os.path.join(icons, 'bookmarks.png')
+        else:
+            label = u'[Войти на ex.ua]'
+            thumbnail = os.path.join(icons, 'key.png')
+        listing.append({'label': label,
+                        'path': plugin.url_for('bookmarks'),
+                        'thumbnail': thumbnail})
     return plugin.finish(listing, view_mode=50)
 
 
@@ -223,7 +241,12 @@ def play_video(url):
     """
     if url[0] == '/':
         url = 'http://www.ex.ua' + url
-    plugin.set_resolved_url(url)
+    if plugin.addon.getSetting('authorization') == 'true' and login_bot.is_logged_in():
+        cookies = '|Cookie=' + urllib.urlencode(login_bot.get_cookies())
+    else:
+        cookies = ''
+    _log('cookies', cookies)
+    plugin.set_resolved_url(url + cookies)
 
 
 @plugin.route('/search_category/<path>')
@@ -237,7 +260,6 @@ def search_category(path):
     if search_text and keyboard.isConfirmed():
         search_path = '/search?s={query}&original_id={id_}'.format(
                             query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
-        _log('search_path', search_path)
         listing = list_videos(search_path, '0', mode='search')
         if listing and plugin.addon.getSetting('savesearch') == 'true':
             storage['search_history'].insert(0, {'text': search_text, 'query': search_path})
@@ -265,6 +287,35 @@ def search_history():
         listing.append({'label': item['text'],
                         'path': plugin.url_for('video_articles', mode='search', path=item['query'], page_No='0'),
                         'thumbnail': os.path.join(icons, 'search.png')})
+    return plugin.finish(listing, view_mode=50)
+
+
+@plugin.route('/bookmarks/')
+def bookmarks():
+    successful_login = False
+    listing = [{'label': u'< Главная',
+                            'path': plugin.url_for('categories'),
+                            'thumbnail': os.path.join(icons, 'home.png')}]
+    if not login_bot.is_logged_in():
+        username = plugin.addon.getSetting('username')
+        password = webbot.decode(plugin.addon.getSetting('password'))
+        captcha = login_bot.check_captcha()
+        if not captcha:
+            captcha['captcha_id'] = captcha['captcha_file'] = ''
+        login_dialog = login_window.LoginWindow(username, password, captcha['captcha_file'])
+        if not login_dialog.login_cancelled:
+            successful_login = login_bot.login(login_dialog.username, login_dialog.password,
+                                        login_dialog.remember_user, login_dialog.captcha_text, captcha['captcha_id'])
+            if successful_login:
+                plugin.addon.setSetting('username', login_dialog.username)
+                if plugin.addon.getSetting('save_pass') == 'true':
+                    plugin.addon.setSetting('password', webbot.encode(login_dialog.password))
+                else:
+                    plugin.addon.setSetting('password', '')
+            else:
+                xbmcgui.Dialog().ok(u'Ошибка входа!', u'Проверьте логин и пароль, а затем повторите попытку')
+    if login_bot.is_logged_in() or successful_login:
+        listing = listing + list_videos('/buffer', '0', mode='list')
     return plugin.finish(listing, view_mode=50)
 
 

@@ -14,4 +14,12 @@
         <setting type="action"
         label="Очистить историю поиска" action="RunScript($CWD/resources/lib/clear_history.py,history)" />
   </category>
+  <category label="Авторизация">
+    <setting id="authorization" type="bool"
+        label="Использовать учетные данные ex.ua" default="false"/>
+    <setting id="save_pass" type="bool"
+        label="Сохранять пароль (не рекомендуется)" enable="eq(-1,true)" default="false"/>
+    <setting type="action"
+        label="Удалить cookies" action="RunScript($CWD/resources/lib/clear_history.py,cookies)" />
+  </category>
 </settings>

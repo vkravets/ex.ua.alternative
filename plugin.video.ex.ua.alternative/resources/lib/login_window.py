@@ -8,13 +8,14 @@ import sys
 import xbmcaddon
 
 _addon = xbmcaddon.Addon()
-sys.path.append(addon.getAddonInfo('path').decode('utf-8'))
+sys.path.append(_addon.getAddonInfo('path').decode('utf-8'))
 from pyxbmct.addonwindow import *
 
 
 class LoginWindow(AddonDialogWindow):
-
+    """ Login window class """
     def __init__(self, username='', password='', captcha=''):
+        """ Class constructor """
         super(LoginWindow, self).__init__()
         self.setGeometry(500, 350, 6, 2)
         self.setWindowTitle(u'Вход на ex.ua')
@@ -22,18 +23,19 @@ class LoginWindow(AddonDialogWindow):
         self.password = password
         self.captcha = captcha
         self.captcha_text = ''
-        self.is_captcha = len(self.captcha)
+        self.captcha_present = len(self.captcha)
         self.login_cancelled = True
         self.set_controls()
         self.set_navigation()
         self.doModal()
 
     def set_controls(self):
+        """ Set UI controls """
         username_label = Label(u'Имя пользователя:')
         self.placeControl(username_label, 0, 0)
         self.username_entry = Edit(u'Введите имя пользователя')
         self.placeControl(self.username_entry, 0, 1)
-        self.username_entry.setText(self.password)
+        self.username_entry.setText(self.username)
         password_label = Label(u'Пароль:')
         self.placeControl(password_label, 1, 0)
         self.password_entry = Edit(u'Введите пароль', isPassword=True)
@@ -41,29 +43,31 @@ class LoginWindow(AddonDialogWindow):
         self.password_entry.setText(self.password)
         self.remember_flag = RadioButton(u'Запомнить меня')
         self.placeControl(self.remember_flag, 2, 0, columnspan=2)
+        self.remember_flag.setSelected(True)
         self.captcha_image = Image(self.captcha)
         self.placeControl(self.captcha_image, 3, 0, rowspan=2)
-        self.captcha_image.setVisible(self.is_captcha)
+        self.captcha_image.setVisible(self.captcha_present)
         self.captcha_label = Label(u'Текст на картинке:')
         self.placeControl(self.captcha_label, 3, 1)
-        self.captcha_label.setVisible(self.is_captcha)
-        self.captcha_entry = Edit(u'Введите текст на картинке')
+        self.captcha_label.setVisible(self.captcha_present)
+        self.captcha_entry = Edit(u'Введите текст на картинке:')
         self.placeControl(self.captcha_entry, 4, 1)
-        self.captcha_entry.setVisible(self.is_captcha)
+        self.captcha_entry.setVisible(self.captcha_present)
         self.cancel_button = Button(u'Отмена')
         self.placeControl(self.cancel_button, 5, 0)
-        self.connect(self.cancel_button, self.cancel_login)
+        self.connect(self.cancel_button, self.close)
         self.login_button = Button(u'Войти')
         self.placeControl(self.login_button, 5, 1)
         self.connect(self.login_button, self.login)
 
     def set_navigation(self):
+        """ Set navigation rules for controls """
         self.username_entry.controlUp(self.login_button)
         self.username_entry.controlDown(self.password_entry)
         self.password_entry.controlUp(self.username_entry)
         self.password_entry.controlDown(self.remember_flag)
         self.remember_flag.controlUp(self.password_entry)
-        if self.is_captcha:
+        if self.captcha_present:
             self.remember_flag.controlDown(self.captcha_entry)
             self.captcha_entry.controlUp(self.remember_flag)
             self.captcha_entry.controlDown(self.login_button)
@@ -76,20 +80,22 @@ class LoginWindow(AddonDialogWindow):
         self.setFocus(self.username_entry)
 
     def login(self):
+        """ Login user """
         self.login_cancelled = False
         self.username = self.username_entry.getText()
         self.password = self.password_entry.getText()
-        if self.is_captcha:
+        if self.captcha_present:
             self.captcha_text = self.captcha_entry.getText()
         self.remember_user = self.remember_flag.isSelected()
         self.close()
 
-    def cancel_login(self):
-        self.username = ''
-        self.password = ''
-        self.captcha_text = ''
-        self.close()
-
+    def close(self):
+        """ Cancel login """
+        if self.login_cancelled:
+            self.username = ''
+            self.password = ''
+            self.captcha_text = ''
+        super(LoginWindow, self).close()
 
 def main():
     pass
