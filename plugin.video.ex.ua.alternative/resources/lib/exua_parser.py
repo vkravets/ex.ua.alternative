@@ -7,7 +7,6 @@
 import re
 import ast
 from bs4 import BeautifulSoup
-import xbmc
 import webbot
 
 SITE = 'http://www.ex.ua'
