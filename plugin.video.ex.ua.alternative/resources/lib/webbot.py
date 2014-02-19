@@ -78,8 +78,8 @@ class WebBot(object):
 
     def check_captcha(self):
         """
-        Check if there is a captcha on a loging page. Returns a path to a downloaded captcha,
-        if any, or an empty string if ther is none.
+        Check if there is a captcha on a loging page. Returns a dictionary
+        with 'captcha_id' and 'captcha_file' keys.
         """
         web_page = self.get_page(LOGIN_URL)
         captcha_group = re.search('<img src=\'\/captcha\?captcha_id=(.+?)\'', web_page, re.UNICODE)
@@ -90,7 +90,7 @@ class WebBot(object):
             urllib.urlretrieve('http://www.ex.ua/captcha?captcha_id=' + captcha_id, captcha_file)
             captcha = {'captcha_id': captcha_id, 'captcha_file': captcha_file}
         else:
-            captcha = {}
+            captcha = {'captcha_id': '', 'captcha_file': ''}
         return captcha
 
     def check_error(self, web_page):

@@ -300,8 +300,6 @@ def bookmarks():
         username = plugin.addon.getSetting('username')
         password = webbot.decode(plugin.addon.getSetting('password'))
         captcha = login_bot.check_captcha()
-        if not captcha:
-            captcha['captcha_id'] = captcha['captcha_file'] = ''
         login_dialog = login_window.LoginWindow(username, password, captcha['captcha_file'])
         if not login_dialog.login_cancelled:
             successful_login = login_bot.login(login_dialog.username, login_dialog.password,
@@ -313,7 +311,7 @@ def bookmarks():
                 else:
                     plugin.addon.setSetting('password', '')
             else:
-                xbmcgui.Dialog().ok(u'Ошибка входа!', u'Проверьте логин и пароль, а затем повторите попытку')
+                xbmcgui.Dialog().ok(u'Ошибка входа!', u'Проверьте логин и пароль, а затем повторите попытку.')
     if login_bot.is_logged_in() or successful_login:
         listing = listing + list_videos('/buffer', '0', mode='list')
     return plugin.finish(listing, view_mode=50)
