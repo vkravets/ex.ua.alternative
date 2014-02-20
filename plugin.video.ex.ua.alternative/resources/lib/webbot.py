@@ -22,7 +22,7 @@ HEADERS = [ ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/2
             ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
             ('Connection', 'keep-alive')]
 
-_cookie_dir = xbmc.translatePath('special://masterprofile/addon_data/plugin.video.ex.ua.aternative')
+_cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.aternative')
 ##_cookie_dir = os.path.dirname(__file__)
 
 
