@@ -21,9 +21,4 @@ provider-name="Roman_V_M">
   <description lang="uk">Надбудова для прегляду відео з EX.UA.</description>
   <platform>all</platform>
 </extension>
-<extension point="xbmc.addon.repository" name="Roman_V_M Repository">
-    <info compressed="false">http://romanvm.dyndns.info:8086/xbmc/addons.xml</info>
-    <checksum>http://romanvm.dyndns.info:8086/xbmc/addons.xml.md5</checksum>
-    <datadir zip="false">http://romanvm.dyndns.info:8086/xbmc/</datadir>
-</extension>
 </addon>

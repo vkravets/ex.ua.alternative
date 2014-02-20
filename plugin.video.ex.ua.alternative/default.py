@@ -104,7 +104,6 @@ def list_videos(path, page_No, mode):
         videos = exua_parser.get_videos(path, page, pages)
     else:
         videos = get_videos(path, page, pages)
-##    _log('bookmarked videos', videos)
     if videos['videos']:
         if page or mode == 'search':
             listing.append({'label': u'<< Главная',
