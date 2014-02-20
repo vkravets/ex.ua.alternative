@@ -39,13 +39,6 @@ SEARCH_CATEGORIES = {   '/ru/video/foreign?r=23775': '2',
                         '/73427589?r=23775': '73427589'}
 
 
-def _log(var_name='', variable=None):
-    """
-    Debug logger.
-    """
-    print u'***!!!DEBUG!!!*** plugin.video.ex.ua.alternative. %s: %s' % (var_name, variable)
-
-
 def get_history_length():
     """
     Get history length as an integer.
@@ -62,6 +55,7 @@ sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
 import webbot
 import login_window
+from logger import log as __log__
 # Create login bot instance.
 login_bot = webbot.WebBot()
 # Create persistent storage for history.
@@ -97,10 +91,11 @@ def list_videos(path, page_No, mode):
     """
     Create a list of video articles to browse.
     """
+    __log__('list_videos; path', path)
     listing = []
     page = int(page_No)
     pages = {'0': '25', '1': '50', '2': '75', '3': '100'}[plugin.addon.getSetting('itemcount')]
-    if path == '/buffer':
+    if plugin.addon.getSetting('cache_pages') == 'false' or path == '/buffer':
         videos = exua_parser.get_videos(path, page, pages)
     else:
         videos = get_videos(path, page, pages)
@@ -123,6 +118,7 @@ def list_videos(path, page_No, mode):
             listing.append({'label': u'Вперед > ' + videos['next'],
                             'path': plugin.url_for('video_articles', mode=mode, path=path, page_No=str(page + 1)),
                             'thumbnail': os.path.join(icons, 'next.png')})
+    __log__('list_videos; listing', listing)
     return listing
 
 
@@ -131,7 +127,10 @@ def categories():
     """
     Show home menu - ex.ua video categories.
     """
-    categories = get_categories()
+    if plugin.addon.getSetting('cache_pages') == 'true':
+        categories = get_categories()
+    else:
+        categories = exua_parser.get_categories()
     listing = []
     for category in categories:
         item = {'label': category['name'] + ' [' + category['items#'] + ']',
@@ -153,6 +152,7 @@ def categories():
         listing.append({'label': label,
                         'path': plugin.url_for('bookmarks'),
                         'thumbnail': thumbnail})
+    __log__('categories; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
 
@@ -161,6 +161,7 @@ def video_articles(mode, path, page_No='0'):
     """
     Show video articles.
     """
+    __log__('video_articles; path', path)
     listing = list_videos(path, page_No, mode)
     if page_No == '0' and mode == 'list':
         listing.insert(0, {'label': u'[Поиск…]',
@@ -169,6 +170,7 @@ def video_articles(mode, path, page_No='0'):
         listing.insert(1, {'label': u'< Главная',
                             'path': plugin.url_for('categories'),
                             'thumbnail': os.path.join(icons, 'home.png')})
+    __log__('video_articles; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
 
@@ -177,7 +179,11 @@ def video_item(video_url):
     """
     Show video details.
     """
-    video_details = get_video_details(video_url)
+    __log__('video_item; video_url', video_url)
+    if plugin.addon.getSetting('cache_pages') == 'true':
+        video_details = get_video_details(video_url)
+    else:
+        video_details = exua_parser.get_video_details(video_url)
     if video_details['videos']:
         if plugin.addon.getSetting('prefer_lq') == 'true' and video_details['flvs']:
             videos_list = []
@@ -230,6 +236,7 @@ def video_item(video_url):
     else:
         listing = list_videos(video_url, '0', mode='list')
         view_mode = 50
+    __log__('video_item; listing', listing)
     return plugin.finish(listing, view_mode=view_mode)
 
 
@@ -238,6 +245,7 @@ def play_video(url):
     """
     Play video.
     """
+    __log__('play_video; url', url)
     if url[0] == '/':
         url = 'http://www.ex.ua' + url
     if plugin.addon.getSetting('authorization') == 'true' and login_bot.is_logged_in():
@@ -259,6 +267,7 @@ def search_category(path):
     if search_text and keyboard.isConfirmed():
         search_path = '/search?s={query}&original_id={id_}'.format(
                             query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
+        __log__('search_category; search_path', search_path)
         listing = list_videos(search_path, '0', mode='search')
         if listing and plugin.addon.getSetting('savesearch') == 'true':
             storage['search_history'].insert(0, {'text': search_text, 'query': search_path})
@@ -271,6 +280,7 @@ def search_category(path):
     listing.insert(1, {'label': u'< Назад',
                             'path': plugin.url_for('video_articles', mode='list', path=path, page_No='0'),
                             'thumbnail': os.path.join(icons, 'previous.png')})
+    __log__('search_category; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
 
@@ -286,6 +296,7 @@ def search_history():
         listing.append({'label': item['text'],
                         'path': plugin.url_for('video_articles', mode='search', path=item['query'], page_No='0'),
                         'thumbnail': os.path.join(icons, 'search.png')})
+    __log__('search_history; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
 
@@ -311,8 +322,11 @@ def bookmarks():
                     plugin.addon.setSetting('password', '')
             else:
                 xbmcgui.Dialog().ok(u'Ошибка входа!', u'Проверьте логин и пароль, а затем повторите попытку.')
+    __log__('bookmarks; is_logged_in', login_bot.is_logged_in())
+    __log__('bookmarks; successful_login', successful_login)
     if login_bot.is_logged_in() or successful_login:
         listing = listing + list_videos('/buffer', '0', mode='list')
+    __log__('bookmarks; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
 

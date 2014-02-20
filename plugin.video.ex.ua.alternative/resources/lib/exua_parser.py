@@ -8,6 +8,10 @@ import re
 import ast
 from bs4 import BeautifulSoup
 import webbot
+from logger import log as __log__
+
+##def __log__(var_name='', variable=None):
+##        print var_name + ': ', variable
 
 SITE = 'http://www.ex.ua'
 loader = webbot.WebBot()
@@ -21,6 +25,7 @@ def get_categories():
         items# (items count)
     """
     web_page = loader.get_page('http://www.ex.ua/ru/video')
+    __log__('exua_parser.get_categories; web_page', web_page)
     CAT_PATTERN = '<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>'
     parse = re.findall(CAT_PATTERN, web_page, re.UNICODE)
     categories = []
@@ -54,6 +59,7 @@ def get_videos(category_url, page=0, pages='25'):
         page_count = '&per=' + pages
     web_page = loader.get_page(SITE + category_url + pageNo + page_count)
     soup = BeautifulSoup(web_page)
+    __log__('exua_parser.get_videos; web_page', web_page)
     videos = []
     content_table = soup.find('table', cellspacing='8')
     if content_table is not None:
@@ -109,6 +115,7 @@ def get_video_details(url):
     details = {}
     details['videos'] = []
     web_page = loader.get_page(SITE + url)
+    __log__('exua_parser.get_video_details; web_page', web_page)
     soup = BeautifulSoup(web_page)
     if u'Артисты @ EX.UA' in soup.find('title').text:
         details['title'] = soup.find('meta', {'name': 'title'})['content']

@@ -13,6 +13,7 @@ import hashlib
 import base64
 import xbmc
 import xbmcvfs
+from logger import log as __log__
 
 LOGIN_URL = 'https://www.ex.ua/login'
 HEADERS = [ ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0'),
@@ -45,6 +46,7 @@ class WebBot(object):
         Load a web-page with a given url.
         """
         self.cookie_jar.revert()
+        __log__('WebBot.get_page; cookies', self.get_cookies())
         try:
             session = self.opener.open(url, data)
         except urllib2.URLError:
@@ -60,7 +62,6 @@ class WebBot(object):
         Check if the cookie jar has login data. Returns True, if login cookie is present.
         """
         for cookie in self.cookie_jar:
-            print '***!!!DEBUG!!!*** cookies: ' + cookie.name + '=' + cookie.value
             if cookie.name == 'ukey' and len(cookie.value) > 1:
                 logged_in = True
                 break
@@ -92,6 +93,7 @@ class WebBot(object):
             captcha = {'captcha_id': captcha_id, 'captcha_file': captcha_file}
         else:
             captcha = {'captcha_id': '', 'captcha_file': ''}
+        __log__('WebBot.check_captcha; captcha', captcha)
         return captcha
 
     def check_error(self, web_page):

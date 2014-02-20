@@ -5,6 +5,8 @@
         label="Предпочитать облегченное видео (при наличии)" default="false"/>
     <setting id="itemcount" type="enum" values="25|50|75|100"
         label="Количество элементов на странице" default = "0"/>
+    <setting id="cache_pages" type="bool"
+        label="Кэшировать страницы" default="true"/>
     <setting type="action"
         label="Очистить кэш страниц" action="RunScript($CWD/resources/lib/clear_history.py,cache)" />
     <setting id="savesearch" type="bool"
@@ -21,5 +23,9 @@
         label="Сохранять пароль (не рекомендуется)" enable="eq(-1,true)" default="false"/>
     <setting type="action"
         label="Удалить cookies" action="RunScript($CWD/resources/lib/clear_history.py,cookies)" />
+  </category>
+  <category label="Отладка">
+    <setting id="debug" type="bool"
+        label="Включить подробный лог отладки" default="false"/>
   </category>
 </settings>
