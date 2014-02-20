@@ -22,7 +22,7 @@ HEADERS = [ ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/2
             ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
             ('Connection', 'keep-alive')]
 
-_cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.aternative')
+_cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.alternative')
 ##_cookie_dir = os.path.dirname(__file__)
 
 
@@ -127,7 +127,7 @@ def encode(clear):
         key_c = key[i % len(key)]
         enc_c = chr((ord(clear[i]) + ord(key_c)) % 256)
         enc.append(enc_c)
-    return base64.urlsafe_b64encode("".join(enc))
+    return base64.urlsafe_b64encode(''.join(enc))
 
 
 def decode(enc):
@@ -138,7 +138,7 @@ def decode(enc):
         key_c = key[i % len(key)]
         dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
         dec.append(dec_c)
-    return "".join(dec)
+    return ''.join(dec)
 
 
 def main():

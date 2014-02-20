@@ -58,8 +58,8 @@ def get_videos(category_url, page=0, pages='25'):
     else:
         page_count = '&per=' + pages
     web_page = loader.get_page(SITE + category_url + pageNo + page_count)
-    soup = BeautifulSoup(web_page)
     __log__('exua_parser.get_videos; web_page', web_page)
+    soup = BeautifulSoup(web_page)
     videos = []
     content_table = soup.find('table', cellspacing='8')
     if content_table is not None:

@@ -235,6 +235,9 @@ def video_item(video_url):
             view_mode = 50
     else:
         listing = list_videos(video_url, '0', mode='list')
+        listing.insert(0, {'label': u'<< Главная',
+                            'path': plugin.url_for('categories'),
+                            'thumbnail': os.path.join(icons, 'home.png')})
         view_mode = 50
     __log__('video_item; listing', listing)
     return plugin.finish(listing, view_mode=view_mode)
