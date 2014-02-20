@@ -3,12 +3,14 @@
   <category label="128">
     <setting id="prefer_lq" type="bool"
         label="Предпочитать облегченное видео (при наличии)" default="false"/>
+    <setting type="sep" />
     <setting id="itemcount" type="enum" values="25|50|75|100"
         label="Количество элементов на странице" default = "0"/>
     <setting id="cache_pages" type="bool"
         label="Кэшировать страницы" default="true"/>
     <setting type="action"
         label="Очистить кэш страниц" action="RunScript($CWD/resources/lib/clear_history.py,cache)" />
+    <setting type="sep" />
     <setting id="savesearch" type="bool"
         label="Сохранять историю поиска" default="true"/>
     <setting id="historylength" type="enum" values="5|10|15|20|25"
@@ -26,6 +28,6 @@
   </category>
   <category label="Отладка">
     <setting id="debug" type="bool"
-        label="Включить подробный лог отладки" default="false"/>
+        label="Включить подробный журнал отладки" default="false"/>
   </category>
 </settings>
