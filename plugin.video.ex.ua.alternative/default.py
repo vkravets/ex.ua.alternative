@@ -252,7 +252,7 @@ def play_video(url):
         cookies = '|Cookie=' + urllib.urlencode(login_bot.get_cookies())
     else:
         cookies = ''
-    _log('cookies', cookies)
+    __log__('play_video; cookies', cookies)
     plugin.set_resolved_url(url + cookies)
 
 
