@@ -59,7 +59,7 @@ def get_videos(category_url, page=0, pages='25'):
         page_count = '&per=' + pages
     web_page = loader.get_page(SITE + category_url + pageNo + page_count)
     __log__('exua_parser.get_videos; web_page', web_page)
-    soup = BeautifulSoup(web_page)
+    soup = BeautifulSoup(web_page, 'html5lib')
     videos = []
     content_table = soup.find('table', cellspacing='8')
     if content_table is not None:
@@ -116,7 +116,7 @@ def get_video_details(url):
     details['videos'] = []
     web_page = loader.get_page(SITE + url)
     __log__('exua_parser.get_video_details; web_page', web_page)
-    soup = BeautifulSoup(web_page)
+    soup = BeautifulSoup(web_page, 'html5lib')
     if u'Артисты @ EX.UA' in soup.find('title').text:
         details['title'] = soup.find('meta', {'name': 'title'})['content']
         details['plot'] = soup.find('div', id="content_page").get_text(' ', strip=True)
@@ -182,9 +182,17 @@ def get_video_details(url):
                 text = ''
             details[detail] = text.replace(': ', '')
         if not details['plot']:
-            plot_tags = soup.find('span', {'class': 'modify_time'})
-            if plot_tags is not None:
-                details['plot'] = plot_tags.find_next('p').get_text(' ', strip=True).replace(u'смотреть онлайн', '')
+            prev_tag = soup.find('span', {'class': 'modify_time'})
+            if prev_tag is not None:
+                text = ''
+                while True:
+                    next_tag = prev_tag.find_next()
+                    if next_tag.name == 'span':
+                        break
+                    else:
+                        text += next_tag.get_text('\n', strip=True)
+                        prev_tag = next_tag
+                details['plot'] = text.replace(u'смотреть онлайн', '')
     return details
 
 
@@ -192,7 +200,7 @@ def main():
     """
     For testing only.
     """
-    videos = get_video_details('/76311211?r=2,23775')
+    videos = get_videos('/ru/video/foreign')
     print videos
 
 if __name__ == '__main__':

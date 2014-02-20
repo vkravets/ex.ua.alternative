@@ -15,6 +15,9 @@ import xbmc
 import xbmcvfs
 from logger import log as __log__
 
+##def __log__(var_name='', variable=None):
+##        print var_name + ': ', variable
+
 LOGIN_URL = 'https://www.ex.ua/login'
 HEADERS = [ ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0'),
             ('Accept-Charset', 'UTF-8'),

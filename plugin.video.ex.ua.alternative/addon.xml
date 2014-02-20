@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.ex.ua.alternative"
-version="1.1.4"
+version="1.1.5"
 name="EX.UA Video Alternative"
 provider-name="Roman_V_M">
 <requires>
@@ -8,6 +8,8 @@ provider-name="Roman_V_M">
   <import addon="script.module.xbmcswift2" version="2.4.0"/>
   <import addon="script.module.beautifulsoup4" version="4.3.0"/>
   <import addon="script.module.simple.downloader" version="1.9.0"/>
+  <import addon="script.module.html5lib" version="0.999.0"/>
+  <import addon="script.module.six" version="1.4.0"/>
 </requires>
 <extension point="xbmc.python.pluginsource" library="default.py">
   <provides>video</provides>
