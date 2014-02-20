@@ -59,7 +59,7 @@ def get_videos(category_url, page=0, pages='25'):
         page_count = '&per=' + pages
     web_page = loader.get_page(SITE + category_url + pageNo + page_count)
     __log__('exua_parser.get_videos; web_page', web_page)
-    soup = BeautifulSoup(web_page, 'html5lib')
+    soup = BeautifulSoup(web_page)
     videos = []
     content_table = soup.find('table', cellspacing='8')
     if content_table is not None:
@@ -116,7 +116,7 @@ def get_video_details(url):
     details['videos'] = []
     web_page = loader.get_page(SITE + url)
     __log__('exua_parser.get_video_details; web_page', web_page)
-    soup = BeautifulSoup(web_page, 'html5lib')
+    soup = BeautifulSoup(web_page)
     if u'Артисты @ EX.UA' in soup.find('title').text:
         details['title'] = soup.find('meta', {'name': 'title'})['content']
         details['plot'] = soup.find('div', id="content_page").get_text(' ', strip=True)
