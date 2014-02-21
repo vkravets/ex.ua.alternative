@@ -48,7 +48,7 @@ class WebBot(object):
         """
         Load a web-page with a given url.
         """
-        self.cookie_jar.revert()
+        self.cookie_jar.load()
         __log__('WebBot.get_page; cookies', self.get_cookies())
         try:
             session = self.opener.open(url, data)
