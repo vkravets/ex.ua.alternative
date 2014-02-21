@@ -109,11 +109,12 @@ class WebBot(object):
         else:
             return False
 
-    def login(self, username, password, captcha_text='', captcha_id=''):
+    def login(self, username, password, remember_user=True, captcha_text='', captcha_id=''):
         """
         Send loging data to ex.ua. Returns True on successful login.
         """
-        login_data = [('login', username), ('password', password), ('flag_permanent', 1), ('flag_not_ip_assign', 1)]
+        login_data = [('login', username), ('password', password), ('flag_permanent', int(remember_user)),
+                                                                    ('flag_not_ip_assign', 1)]
         if captcha_text:
             login_data.append(('captcha_value', captcha_text))
             login_data.append(('captcha_id', captcha_id))
