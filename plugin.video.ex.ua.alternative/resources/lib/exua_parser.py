@@ -7,16 +7,39 @@
 import re
 import ast
 from bs4 import BeautifulSoup
-import webbot
-from logger import log as __log__
 
-##def __log__(var_name='', variable=None):
-##        print var_name + ': ', variable
+if __name__ == '__main__':
+    # This is for testing purposes when the module is run from console.
+    def __log__(var_name='', variable=None):
+        print var_name + ': ', variable
+else: # If the module is imported during normal plugin run.
+    from logger import log as __log__
 
 SITE = 'http://www.ex.ua'
-loader = webbot.WebBot()
 
-def get_categories():
+class WebLoader(object):
+    """ WebLoader class for testing purposes only """
+    def get_page(self, url):
+        """
+        Load a web-page with provided url.
+        Return a loaded page or an empty string in case of a network error.
+        """
+        request = urllib2.Request(url, None,
+                        {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
+                        'Host': SITE[7:],
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Accept-Charset': 'UTF-8'})
+        try:
+            session = urllib2.urlopen(request, None, 5)
+        except urllib2.URLError:
+            page = ''
+        else:
+            page = session.read().decode('utf-8')
+            session.close()
+        return page
+
+
+def get_categories(loader):
     """
     Get the list of video categories.
     Return the list of caterory properies:
@@ -38,7 +61,7 @@ def get_categories():
     return categories
 
 
-def get_videos(category_url, page=0, pages='25'):
+def get_videos(category_url, loader, page=0, pages='25'):
     """
     Get the list of videos from categories.
     Return the dictionary:
@@ -98,7 +121,7 @@ def get_videos(category_url, page=0, pages='25'):
     return {'videos': videos, 'prev': prev_page, 'next': next_page}
 
 
-def get_video_details(url):
+def get_video_details(url, loader):
     """
     Get video details.
     Return a dictionary with the following properties:
@@ -200,7 +223,8 @@ def main():
     """
     For testing only.
     """
-    videos = get_videos('/ru/video/foreign')
+    loader = WebLoader()
+    videos = get_videos('/ru/video/foreign', loader)
     print videos
 
 if __name__ == '__main__':

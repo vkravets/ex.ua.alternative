@@ -17,7 +17,7 @@ class LoginWindow(AddonDialogWindow):
     def __init__(self, username='', password='', captcha=''):
         """ Class constructor """
         super(LoginWindow, self).__init__()
-        self.setGeometry(500, 300, 5, 2)
+        self.setGeometry(500, 350, 6, 2)
         self.setWindowTitle(u'Вход на ex.ua')
         self.username = username
         self.password = password
@@ -41,20 +41,23 @@ class LoginWindow(AddonDialogWindow):
         self.password_entry = Edit(u'Введите пароль', isPassword=True)
         self.placeControl(self.password_entry, 1, 1)
         self.password_entry.setText(self.password)
+        self.remember_flag = RadioButton(u'Запомнить меня')
+        self.placeControl(self.remember_flag, 2, 0, columnspan=2)
+        self.remember_flag.setSelected(True)
         self.captcha_image = Image(self.captcha)
-        self.placeControl(self.captcha_image, 2, 0, rowspan=2)
+        self.placeControl(self.captcha_image, 3, 0, rowspan=2)
         self.captcha_image.setVisible(self.captcha_present)
         self.captcha_label = Label(u'Текст на картинке:')
-        self.placeControl(self.captcha_label, 2, 1)
+        self.placeControl(self.captcha_label, 3, 1)
         self.captcha_label.setVisible(self.captcha_present)
-        self.captcha_entry = Edit(u'Введите текст на картинке')
-        self.placeControl(self.captcha_entry, 3, 1)
+        self.captcha_entry = Edit(u'Введите текст на картинке:')
+        self.placeControl(self.captcha_entry, 4, 1)
         self.captcha_entry.setVisible(self.captcha_present)
         self.cancel_button = Button(u'Отмена')
-        self.placeControl(self.cancel_button, 4, 0)
+        self.placeControl(self.cancel_button, 5, 0)
         self.connect(self.cancel_button, self.close)
         self.login_button = Button(u'Войти')
-        self.placeControl(self.login_button, 4, 1)
+        self.placeControl(self.login_button, 5, 1)
         self.connect(self.login_button, self.login)
 
     def set_navigation(self):
@@ -62,16 +65,18 @@ class LoginWindow(AddonDialogWindow):
         self.username_entry.controlUp(self.login_button)
         self.username_entry.controlDown(self.password_entry)
         self.password_entry.controlUp(self.username_entry)
+        self.password_entry.controlDown(self.remember_flag)
+        self.remember_flag.controlUp(self.password_entry)
         if self.captcha_present:
-            self.password_entry.controlDown(self.captcha_entry)
-            self.captcha_entry.controlUp(self.password_entry)
+            self.remember_flag.controlDown(self.captcha_entry)
+            self.captcha_entry.controlUp(self.remember_flag)
             self.captcha_entry.controlDown(self.login_button)
             self.login_button.setNavigation(self.captcha_entry, self.username_entry, self.cancel_button, self.cancel_button)
             self.cancel_button.setNavigation(self.captcha_entry, self.username_entry, self.login_button, self.login_button)
         else:
-            self.password_entry.controlDown(self.login_button)
-            self.login_button.setNavigation(self.password_entry, self.username_entry, self.cancel_button, self.cancel_button)
-            self.cancel_button.setNavigation(self.password_entry, self.username_entry, self.login_button, self.login_button)
+            self.remember_flag.controlDown(self.login_button)
+            self.login_button.setNavigation(self.remember_flag, self.username_entry, self.cancel_button, self.cancel_button)
+            self.cancel_button.setNavigation(self.remember_flag, self.username_entry, self.login_button, self.login_button)
         self.setFocus(self.username_entry)
 
     def login(self):
@@ -81,6 +86,7 @@ class LoginWindow(AddonDialogWindow):
         self.password = self.password_entry.getText()
         if self.captcha_present:
             self.captcha_text = self.captcha_entry.getText()
+        self.remember_user = self.remember_flag.isSelected()
         self.close()
 
     def close(self):

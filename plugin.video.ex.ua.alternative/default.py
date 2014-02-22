@@ -53,11 +53,11 @@ icons = os.path.join(addon_path, 'resources', 'icons')
 # Import custom module.
 sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
-import webbot
+import webloader
 import login_window
 from logger import log as __log__
-# Create login bot instance.
-login_bot = webbot.WebBot()
+# Create web loader instance.
+loader = webloader.WebLoader()
 # Create persistent storage for history.
 storage = plugin.get_storage('storage')
 if plugin.addon.getSetting('savesearch') == 'true':
@@ -72,19 +72,19 @@ if plugin.addon.getSetting('savesearch') == 'true':
 # Cache the main page for 3 hours
 @plugin.cached(60*3)
 def get_categories():
-    return exua_parser.get_categories()
+    return exua_parser.get_categories(loader)
 
 
 # Cache video list for 30 minutes
 @plugin.cached(30)
 def get_videos(path, page, pages):
-    return exua_parser.get_videos(path, page, pages)
+    return exua_parser.get_videos(path, loader, page, pages)
 
 
 # Cache video details for 1 day.
 @plugin.cached()
 def get_video_details(video_url):
-    return exua_parser.get_video_details(video_url)
+    return exua_parser.get_video_details(video_url, loader)
 
 
 def list_videos(path, page_No, mode):
@@ -96,7 +96,7 @@ def list_videos(path, page_No, mode):
     page = int(page_No)
     pages = {'0': '25', '1': '50', '2': '75', '3': '100'}[plugin.addon.getSetting('itemcount')]
     if plugin.addon.getSetting('cache_pages') == 'false' or path == '/buffer':
-        videos = exua_parser.get_videos(path, page, pages)
+        videos = exua_parser.get_videos(path, loader, page, pages)
     else:
         videos = get_videos(path, page, pages)
     if videos['videos']:
@@ -130,7 +130,7 @@ def categories():
     if plugin.addon.getSetting('cache_pages') == 'true':
         categories = get_categories()
     else:
-        categories = exua_parser.get_categories()
+        categories = exua_parser.get_categories(loader)
     listing = []
     for category in categories:
         item = {'label': category['name'] + ' [' + category['items#'] + ']',
@@ -143,7 +143,7 @@ def categories():
                         'path': plugin.url_for('search_history'),
                         'thumbnail': os.path.join(icons, 'search.png')})
     if plugin.addon.getSetting('authorization') == 'true':
-        if login_bot.is_logged_in():
+        if loader.is_logged_in():
             label = u'[Мои закладки]'
             thumbnail = os.path.join(icons, 'bookmarks.png')
         else:
@@ -183,7 +183,7 @@ def video_item(video_url):
     if plugin.addon.getSetting('cache_pages') == 'true':
         video_details = get_video_details(video_url)
     else:
-        video_details = exua_parser.get_video_details(video_url)
+        video_details = exua_parser.get_video_details(video_url, loader)
     if video_details['videos']:
         if plugin.addon.getSetting('prefer_lq') == 'true' and video_details['flvs']:
             videos_list = []
@@ -251,8 +251,8 @@ def play_video(url):
     __log__('play_video; url', url)
     if url[0] == '/':
         url = 'http://www.ex.ua' + url
-    if plugin.addon.getSetting('authorization') == 'true' and login_bot.is_logged_in():
-        cookies = '|Cookie=' + urllib.urlencode(login_bot.get_cookies())
+    if plugin.addon.getSetting('authorization') == 'true' and loader.is_logged_in():
+        cookies = '|Cookie=' + urllib.urlencode(loader.get_cookies())
     else:
         cookies = ''
     __log__('play_video; cookies', cookies)
@@ -309,25 +309,25 @@ def bookmarks():
     listing = [{'label': u'< Главная',
                             'path': plugin.url_for('categories'),
                             'thumbnail': os.path.join(icons, 'home.png')}]
-    if not login_bot.is_logged_in():
+    if not loader.is_logged_in():
         username = plugin.addon.getSetting('username')
-        password = webbot.decode(plugin.addon.getSetting('password'))
-        captcha = login_bot.check_captcha()
+        password = webloader.decode(plugin.addon.getSetting('password'))
+        captcha = loader.check_captcha()
         login_dialog = login_window.LoginWindow(username, password, captcha['captcha_file'])
         if not login_dialog.login_cancelled:
-            successful_login = login_bot.login(login_dialog.username, login_dialog.password,
-                                                                    login_dialog.captcha_text, captcha['captcha_id'])
+            successful_login = loader.login(login_dialog.username, login_dialog.password,
+                                        login_dialog.remember_user, login_dialog.captcha_text, captcha['captcha_id'])
             if successful_login:
                 plugin.addon.setSetting('username', login_dialog.username)
                 if plugin.addon.getSetting('save_pass') == 'true':
-                    plugin.addon.setSetting('password', webbot.encode(login_dialog.password))
+                    plugin.addon.setSetting('password', webloader.encode(login_dialog.password))
                 else:
                     plugin.addon.setSetting('password', '')
             else:
                 xbmcgui.Dialog().ok(u'Ошибка входа!', u'Проверьте логин и пароль, а затем повторите попытку.')
-    __log__('bookmarks; is_logged_in', login_bot.is_logged_in())
+    __log__('bookmarks; is_logged_in', loader.is_logged_in())
     __log__('bookmarks; successful_login', successful_login)
-    if login_bot.is_logged_in() or successful_login:
+    if loader.is_logged_in() or successful_login:
         listing = listing + list_videos('/buffer', '0', mode='list')
     __log__('bookmarks; listing', listing)
     return plugin.finish(listing, view_mode=50)

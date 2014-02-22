@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Name:        webbot
+# Name:        webloader
 # Author:      Roman V.M.
 # Created:     18.02.2014
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
@@ -11,25 +11,22 @@ import cookielib
 import re
 import hashlib
 import base64
-import xbmc
-import xbmcvfs
-from logger import log as __log__
 
-##def __log__(var_name='', variable=None):
-##        print var_name + ': ', variable
+if __name__ == '__main__':
+    # This is for testing purposes when the module is run from console.
+    _cookie_dir = os.path.dirname(__file__)
+
+    def __log__(var_name='', variable=None):
+        print var_name + ': ', variable
+else: # If the module is imported during normal plugin run.
+    import xbmc
+    from logger import log as __log__
+    _cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.alternative')
 
 LOGIN_URL = 'https://www.ex.ua/login'
-HEADERS = [ ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0'),
-            ('Accept-Charset', 'UTF-8'),
-            ('Host', 'www.ex.ua'),
-            ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
-            ('Connection', 'keep-alive')]
-
-_cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.alternative')
-##_cookie_dir = os.path.dirname(__file__)
 
 
-class WebBot(object):
+class WebLoader(object):
 
     def __init__(self):
         """
@@ -42,7 +39,12 @@ class WebBot(object):
             self.cookie_jar.save()
         self.cookie_jar.revert()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie_jar))
-        self.opener.addheaders = HEADERS
+        self.opener.addheaders = [
+            ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0'),
+            ('Accept-Charset', 'UTF-8'),
+            ('Host', 'www.ex.ua'),
+            ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
+            ('Connection', 'keep-alive')]
 
     def get_page(self, url, data=None):
         """
@@ -91,7 +93,7 @@ class WebBot(object):
         if captcha_group is not None:
             captcha_id = captcha_group.group(1)
             captcha_file = os.path.join(_cookie_dir, 'captcha.png')
-            xbmcvfs.delete(captcha_file)
+            os.remove(captcha_file)
             urllib.urlretrieve('http://www.ex.ua/captcha?captcha_id=' + captcha_id, captcha_file)
             captcha = {'captcha_id': captcha_id, 'captcha_file': captcha_file}
         else:
@@ -109,11 +111,12 @@ class WebBot(object):
         else:
             return False
 
-    def login(self, username, password, captcha_text='', captcha_id=''):
+    def login(self, username, password, remember_user=True, captcha_text='', captcha_id=''):
         """
         Send loging data to ex.ua. Returns True on successful login.
         """
-        login_data = [('login', username), ('password', password), ('flag_permanent', 1), ('flag_not_ip_assign', 1)]
+        login_data = [('login', username), ('password', password), ('flag_permanent', int(remember_user)),
+                                                                    ('flag_not_ip_assign', 1)]
         if captcha_text:
             login_data.append(('captcha_value', captcha_text))
             login_data.append(('captcha_id', captcha_id))
@@ -144,7 +147,6 @@ def decode(enc):
 
 
 def main():
-    webbot = WebBot()
     pass
 
 if __name__ == '__main__':
