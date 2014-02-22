@@ -17,7 +17,7 @@ if __name__ == '__main__':
     _cookie_dir = os.path.dirname(__file__)
 
     def __log__(var_name='', variable=None):
-        print var_name + ': ', variable
+        pass
 else: # If the module is imported during normal plugin run.
     import xbmc
     from logger import log as __log__

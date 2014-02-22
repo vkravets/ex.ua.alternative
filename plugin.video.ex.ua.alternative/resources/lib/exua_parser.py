@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 if __name__ == '__main__':
     # This is for testing purposes when the module is run from console.
     def __log__(var_name='', variable=None):
-        print var_name + ': ', variable
+        pass
 else: # If the module is imported during normal plugin run.
     from logger import log as __log__
 
