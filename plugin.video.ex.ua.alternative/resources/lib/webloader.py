@@ -18,6 +18,7 @@ if __name__ == '__main__':
 
     def __log__(var_name='', variable=None):
         pass
+
 else: # If the module is imported during normal plugin run.
     import xbmc
     from logger import log as __log__
