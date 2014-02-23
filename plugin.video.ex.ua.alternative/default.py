@@ -205,9 +205,9 @@ def video_item(video_url):
                     'is_playable': True,
                     'path': plugin.url_for('play_video', url=video['url']),
                     'context_menu': [(u'Загрузить файл…',
-                                        u'RunScript({path}/resources/lib/downloader.py,{url},{filename})'.format(
+                                    u'RunScript({path}/resources/lib/commands.py,download,{url},{filename})'.format(
                                                     path=addon_path, url=video['url'],
-                                                        filename=video['filename']))]
+                                                    filename=video['filename']))]
                     }
             if video_details['year']:
                 try:

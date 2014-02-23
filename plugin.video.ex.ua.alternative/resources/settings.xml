@@ -9,14 +9,14 @@
     <setting id="cache_pages" type="bool"
         label="Кэшировать страницы" default="true"/>
     <setting type="action"
-        label="Очистить кэш страниц" action="RunScript($CWD/resources/lib/clear_history.py,cache)" />
+        label="Очистить кэш страниц" action="RunScript($CWD/resources/lib/commands.py,cache)" />
     <setting type="sep" />
     <setting id="savesearch" type="bool"
         label="Сохранять историю поиска" default="true"/>
     <setting id="historylength" type="enum" values="5|10|15|20|25"
         label="Длина истории поиска" enable="eq(-1,true)" default = "1"/>
         <setting type="action"
-        label="Очистить историю поиска" action="RunScript($CWD/resources/lib/clear_history.py,history)" />
+        label="Очистить историю поиска" action="RunScript($CWD/resources/lib/commands.py,history)" />
   </category>
   <category label="Авторизация">
     <setting id="authorization" type="bool"
@@ -24,7 +24,7 @@
     <setting id="save_pass" type="bool"
         label="Сохранять пароль (не рекомендуется)" enable="eq(-1,true)" default="false"/>
     <setting type="action"
-        label="Удалить cookies" action="RunScript($CWD/resources/lib/clear_history.py,cookies)" />
+        label="Удалить cookies" action="RunScript($CWD/resources/lib/commands.py,cookies)" />
   </category>
   <category label="Отладка">
     <setting id="debug" type="bool"
