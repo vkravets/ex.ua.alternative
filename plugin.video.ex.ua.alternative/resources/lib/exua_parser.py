@@ -10,8 +10,11 @@ from bs4 import BeautifulSoup
 
 if __name__ == '__main__':
     # This is for testing purposes when the module is run from console.
+    import urllib2
+
     def __log__(var_name='', variable=None):
         pass
+
 else: # If the module is imported during normal plugin run.
     from logger import log as __log__
 
@@ -30,7 +33,7 @@ class WebLoader(object):
                         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                         'Accept-Charset': 'UTF-8'})
         try:
-            session = urllib2.urlopen(request, None, 5)
+            session = urllib2.urlopen(request)
         except urllib2.URLError:
             page = ''
         else:
@@ -219,13 +222,32 @@ def get_video_details(url, loader):
     return details
 
 
+def check_page(url, loader):
+    web_page = loader.get_page(SITE + url)
+    try:
+        if re.search(u'Файлы:', web_page, re.UNICODE) is not None:
+            page_type = 'video_page'
+            raise RuntimeError
+        elif re.search('<table width=100%.+?cellspacing=8', web_page, re.UNICODE) is not None:
+            page_type = 'video_list'
+            raise RuntimeError
+        elif re.search(u'Видео на других языках', web_page, re.UNICODE) is not None:
+            page_type = 'categories'
+            raise RuntimeError
+    except RuntimeError:
+        pass
+    else:
+        page_type = 'unknown'
+    return page_type
+
+
 def main():
     """
     For testing only.
     """
     loader = WebLoader()
-    videos = get_videos('/ru/video/foreign', loader)
-    print videos
+    details = get_video_details('/72967731?r=1988,23775', loader)
+    print details
 
 if __name__ == '__main__':
     main()
