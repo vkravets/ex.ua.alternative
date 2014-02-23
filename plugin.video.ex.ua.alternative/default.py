@@ -189,9 +189,9 @@ def video_item(video_url):
             videos_list = []
             for index in range(len(video_details['flvs'])):
                 flv = {}
-                flv['filename'] = 'Video ' + str(index + 1)
+                flv['filename'] = 'Video%s.flv' % str(index + 1)
                 flv['url'] = video_details['flvs'][index]
-            videos_list.append(flv)
+                videos_list.append(flv)
         else:
             videos_list = video_details['videos']
         listing = []
