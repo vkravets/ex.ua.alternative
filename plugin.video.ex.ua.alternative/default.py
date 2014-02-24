@@ -194,6 +194,14 @@ def video_item(video_url):
                 videos_list.append(flv)
         else:
             videos_list = video_details['videos']
+            if video_details['flvs']:
+                index1 = 0
+                context_play_flv = []
+                for flv in video_details['flvs']:
+                    context_menu_item = (u'Смотреть облегченное видео',
+                                            u'RunScript({path}/resources/lib/commands.py,play_flv,%s' % flv)
+                    context_play_flv.append(context_menu_item)
+                __log__('video_item; context_play_flv', context_play_flv)
         listing = []
         for video in videos_list:
             item = {'label': video['filename'],
@@ -216,6 +224,10 @@ def video_item(video_url):
                     pass
             if video_details['cast']:
                 item['info']['cast'] = video_details['cast'].split(', ')
+            if plugin.addon.getSetting('prefer_lq') == 'false' and video_details['flvs']:
+                __log__('video_item; index1', index1)
+                item['context_menu'].append(context_play_flv[index1])
+                index1 += 1
 ##            if video_details['duration']:
 ##                duration = video_details['duration'].split(':')
 ##                try:

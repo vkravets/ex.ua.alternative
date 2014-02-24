@@ -5,9 +5,11 @@
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
 import sys
+import xbmc
 import xbmcvfs
 import xbmcgui
 from SimpleDownloader import SimpleDownloader
+from logger import log as __log__
 
 
 def main():
@@ -26,7 +28,11 @@ def main():
         if download_path:
             params = {'url': 'http://www.ex.ua' + sys.argv[2], 'download_path': download_path, 'Title': u'Загрузка файла'}
             downloader.download(sys.argv[3].decode('utf-8'), params)
+    elif sys.argv[1] == 'play_flv':
+        __log__('commands; play flv_file')
+        xbmc.Player().play(sys.argv[2])
 
 
 if __name__ == '__main__':
+    __log__('commands run')
     main()
