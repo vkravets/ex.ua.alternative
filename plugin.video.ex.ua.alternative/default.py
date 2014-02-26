@@ -6,7 +6,6 @@
 
 # Import standard modules
 import sys
-import re
 import urllib
 import os
 # Import XBMC modules
