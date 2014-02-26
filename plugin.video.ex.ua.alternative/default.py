@@ -186,10 +186,7 @@ def video_item(video_url):
         if plugin.addon.getSetting('prefer_lq') == 'true' and video_details['flvs']:
             videos_list = []
             for index in range(len(video_details['flvs'])):
-                flv = {}
-                flv['filename'] = 'Video%s.flv' % str(index + 1)
-                flv['url'] = video_details['flvs'][index]
-                videos_list.append(flv)
+                videos_list.append({'filename': 'Video%s.flv' % str(index + 1), 'url': video_details['flvs'][index]})
         else:
             videos_list = video_details['videos']
         listing = []
