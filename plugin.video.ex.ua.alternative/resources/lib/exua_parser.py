@@ -163,11 +163,16 @@ def get_video_details(url, loader):
             details['thumb'] = thumb_tag['href'][:-3] + IMG_QUALITY
         else:
             details['thumb'] = ''
-        search_video = soup.find_all('a', title=re.compile(
+        video_tags = soup.find_all('a', title=re.compile(
             '(.*\.(?:avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|'
             'AVI|MKV|TS|M2TS|MP4|M4V|FLV|VOB|MPG|MPEG|ISO|MOV|WMV|RAR|ZIP)(?!.))'))
-        for video in search_video:
-            details['videos'].append({'filename': video.text, 'url': video['href']})
+        for video_tag in video_tags:
+            mirror_tags = video_tag.find_next('td', {'class': 'small'}).find_all('a', {'rel': 'nofollow', 'title': True})
+            mirrors = []
+            if mirror_tags is not None:
+                for mirror_tag in mirror_tags:
+                    mirrors.append(mirror_tag['href'])
+            details['videos'].append({'filename': video_tag.text, 'url': video_tag['href'], 'mirrors': mirrors})
         search_script = soup.find_all('script')
         for script in search_script:
             var_player_list = re.search('player_list = \'(.*)\';', script.text)
@@ -248,7 +253,8 @@ def main():
     """
     loader = WebLoader()
     details = get_video_details('/72967731?r=1988,23775', loader)
-    print details
+    for key in details.keys():
+        print key + ': ', details[key]
 
 
 if __name__ == '__main__':
