@@ -16,26 +16,26 @@ from xbmcswift2 import Plugin
 
 
 # Numeric codes for search in video categories
-SEARCH_CATEGORIES = {   '/ru/video/foreign?r=23775': '2',
-                        '/ru/video/our?r=23775': '70538',
-                        '/ru/video/foreign_series?r=23775': '1988',
-                        '/ru/video/our_series?r=23775': '422546',
-                        '/ru/video/cartoon?r=23775': '1989',
-                        '/ru/video/anime?r=23775': '23786',
-                        '/ru/video/documentary?r=23775': '1987',
-                        '/ru/video/trailer?r=23775': '1990',
-                        '/ru/video/clip?r=23775': '1991',
-                        '/ru/video/concert?r=23775': '70533',
-                        '/ru/video/show?r=23775': '23775',
-                        '/ru/video/training?r=23775': '28714',
-                        '/ru/video/sport?r=23775': '69663',
-                        '/ru/video/short?r=23775': '23785',
-                        '/ru/video/theater?r=23775': '70665',
-                        '/ru/video/sermon?r=23775': '371146',
-                        '/ru/video/commercial?r=23775': '371152',
-                        '/ru/video/mobile?r=23775': '607160',
-                        '/ru/video/artist?r=23775': '7513588',
-                        '/73427589?r=23775': '73427589'}
+SEARCH_CATEGORIES = {'/ru/video/foreign?r=23775': '2',
+                     '/ru/video/our?r=23775': '70538',
+                     '/ru/video/foreign_series?r=23775': '1988',
+                     '/ru/video/our_series?r=23775': '422546',
+                     '/ru/video/cartoon?r=23775': '1989',
+                     '/ru/video/anime?r=23775': '23786',
+                     '/ru/video/documentary?r=23775': '1987',
+                     '/ru/video/trailer?r=23775': '1990',
+                     '/ru/video/clip?r=23775': '1991',
+                     '/ru/video/concert?r=23775': '70533',
+                     '/ru/video/show?r=23775': '23775',
+                     '/ru/video/training?r=23775': '28714',
+                     '/ru/video/sport?r=23775': '69663',
+                     '/ru/video/short?r=23775': '23785',
+                     '/ru/video/theater?r=23775': '70665',
+                     '/ru/video/sermon?r=23775': '371146',
+                     '/ru/video/commercial?r=23775': '371152',
+                     '/ru/video/mobile?r=23775': '607160',
+                     '/ru/video/artist?r=23775': '7513588',
+                     '/73427589?r=23775': '73427589'}
 
 
 def get_history_length():
@@ -69,7 +69,7 @@ if plugin.addon.getSetting('savesearch') == 'true':
 
 
 # Cache the main page for 3 hours
-@plugin.cached(60*3)
+@plugin.cached(60 * 3)
 def get_categories():
     return exua_parser.get_categories(loader)
 
@@ -110,8 +110,7 @@ def list_videos(path, page_No, mode):
         for video in videos['videos']:
             item = {'label': video['title'],
                     'thumbnail': video['thumb'],
-                    'path': plugin.url_for('video_item', video_url=video['url'])
-                    }
+                    'path': plugin.url_for('video_item', video_url=video['url'])}
             listing.append(item)
         if videos['next']:
             listing.append({'label': u'Вперед > ' + videos['next'],
@@ -135,7 +134,7 @@ def categories():
         item = {'label': category['name'] + ' [' + category['items#'] + ']',
                 'path': plugin.url_for('video_articles', mode='list', path=category['url'], page_No='0'),
                 'thumbnail': os.path.join(icons, 'video.png')
-                }
+        }
         listing.append(item)
     if plugin.addon.getSetting('savesearch') == 'true':
         listing.append({'label': u'[История поиска]',
@@ -164,11 +163,11 @@ def video_articles(mode, path, page_No='0'):
     listing = list_videos(path, page_No, mode)
     if page_No == '0' and mode == 'list':
         listing.insert(0, {'label': u'[Поиск…]',
-                            'path': plugin.url_for('search_category', path=path),
-                            'thumbnail': os.path.join(icons, 'search.png')})
+                           'path': plugin.url_for('search_category', path=path),
+                           'thumbnail': os.path.join(icons, 'search.png')})
         listing.insert(1, {'label': u'< Главная',
-                            'path': plugin.url_for('categories'),
-                            'thumbnail': os.path.join(icons, 'home.png')})
+                           'path': plugin.url_for('categories'),
+                           'thumbnail': os.path.join(icons, 'home.png')})
     __log__('video_articles; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
@@ -197,17 +196,17 @@ def video_item(video_url):
         for video in videos_list:
             item = {'label': video['filename'],
                     'thumbnail': video_details['thumb'],
-                    'info': {   'title': video['filename'],
-                                'genre': video_details['genre'],
-                                'director': video_details['director'],
-                                'plot': video_details['plot']},
+                    'info': {'title': video['filename'],
+                             'genre': video_details['genre'],
+                             'director': video_details['director'],
+                             'plot': video_details['plot']},
                     'is_playable': True,
                     'path': plugin.url_for('play_video', url=video['url']),
                     'context_menu': [(u'Загрузить файл…',
-                                    u'RunScript({path}/resources/lib/commands.py,download,{url},{filename})'.format(
-                                                    path=addon_path, url=video['url'],
-                                                    filename=video['filename']))]
-                    }
+                                      u'RunScript({path}/resources/lib/commands.py,download,{url},{filename})'.format(
+                                          path=addon_path, url=video['url'],
+                                          filename=video['filename']))]
+            }
             if video_details['year']:
                 try:
                     item['info']['year'] = int(video_details['year'])
@@ -215,12 +214,12 @@ def video_item(video_url):
                     pass
             if video_details['cast']:
                 item['info']['cast'] = video_details['cast'].split(', ')
-##            if video_details['duration']:
-##                duration = video_details['duration'].split(':')
-##                try:
-##                    item['info']['duration'] = str(int(duration[0]) * 60 + int(duration[1]))
-##                except ValueError:
-##                    pass
+            ##            if video_details['duration']:
+            ##                duration = video_details['duration'].split(':')
+            ##                try:
+            ##                    item['info']['duration'] = str(int(duration[0]) * 60 + int(duration[1]))
+            ##                except ValueError:
+            ##                    pass
             listing.append(item)
         # Switch view based on a current skin.
         current_skin = xbmc.getSkinDir()
@@ -235,8 +234,8 @@ def video_item(video_url):
     else:
         listing = list_videos(video_url, '0', mode='list')
         listing.insert(0, {'label': u'<< Главная',
-                            'path': plugin.url_for('categories'),
-                            'thumbnail': os.path.join(icons, 'home.png')})
+                           'path': plugin.url_for('categories'),
+                           'thumbnail': os.path.join(icons, 'home.png')})
         view_mode = 50
     __log__('video_item; listing', listing)
     return plugin.finish(listing, view_mode=view_mode)
@@ -268,7 +267,7 @@ def search_category(path):
     search_text = keyboard.getText()
     if search_text and keyboard.isConfirmed():
         search_path = '/search?s={query}&original_id={id_}'.format(
-                            query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
+            query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
         __log__('search_category; search_path', search_path)
         listing = list_videos(search_path, '0', mode='search')
         if listing and plugin.addon.getSetting('savesearch') == 'true':
@@ -280,8 +279,8 @@ def search_category(path):
     else:
         listing = []
     listing.insert(1, {'label': u'< Назад',
-                            'path': plugin.url_for('video_articles', mode='list', path=path, page_No='0'),
-                            'thumbnail': os.path.join(icons, 'previous.png')})
+                       'path': plugin.url_for('video_articles', mode='list', path=path, page_No='0'),
+                       'thumbnail': os.path.join(icons, 'previous.png')})
     __log__('search_category; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
@@ -292,8 +291,8 @@ def search_history():
     Show search history.
     """
     listing = [{'label': u'< Главная',
-                            'path': plugin.url_for('categories'),
-                            'thumbnail': os.path.join(icons, 'home.png')}]
+                'path': plugin.url_for('categories'),
+                'thumbnail': os.path.join(icons, 'home.png')}]
     for item in storage.get('search_history'):
         listing.append({'label': item['text'],
                         'path': plugin.url_for('video_articles', mode='search', path=item['query'], page_No='0'),
@@ -306,8 +305,8 @@ def search_history():
 def bookmarks():
     successful_login = False
     listing = [{'label': u'< Главная',
-                            'path': plugin.url_for('categories'),
-                            'thumbnail': os.path.join(icons, 'home.png')}]
+                'path': plugin.url_for('categories'),
+                'thumbnail': os.path.join(icons, 'home.png')}]
     if not loader.is_logged_in():
         username = plugin.addon.getSetting('username')
         password = webloader.decode(plugin.addon.getSetting('password'))
@@ -315,7 +314,8 @@ def bookmarks():
         login_dialog = login_window.LoginWindow(username, password, captcha['captcha_file'])
         if not login_dialog.login_cancelled:
             successful_login = loader.login(login_dialog.username, login_dialog.password,
-                                        login_dialog.remember_user, login_dialog.captcha_text, captcha['captcha_id'])
+                                            login_dialog.remember_user, login_dialog.captcha_text,
+                                            captcha['captcha_id'])
             if successful_login:
                 plugin.addon.setSetting('username', login_dialog.username)
                 if plugin.addon.getSetting('save_pass') == 'true':

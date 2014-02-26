@@ -11,14 +11,22 @@ from bs4 import BeautifulSoup
 if __name__ == '__main__':
     # This is for testing purposes when the module is run from console.
     import urllib2
+    IMG_QUALITY = '200'
 
     def __log__(var_name='', variable=None):
         pass
 
-else: # If the module is imported during normal plugin run.
+else:  # If the module is imported during normal plugin run.
+    import xbmcaddon
     from logger import log as __log__
+    _addon = xbmcaddon.Addon()
+    if _addon.getSetting('hq_posters') == 'true':
+        IMG_QUALITY = '400'
+    else:
+        IMG_QUALITY = '200'
 
 SITE = 'http://www.ex.ua'
+
 
 class WebLoader(object):
     """ WebLoader class for testing purposes only """
@@ -28,10 +36,10 @@ class WebLoader(object):
         Return a loaded page or an empty string in case of a network error.
         """
         request = urllib2.Request(url, None,
-                        {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
-                        'Host': SITE[7:],
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                        'Accept-Charset': 'UTF-8'})
+                              {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
+                              'Host': SITE[7:],
+                              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                              'Accept-Charset': 'UTF-8'})
         try:
             session = urllib2.urlopen(request)
         except urllib2.URLError:
@@ -56,11 +64,7 @@ def get_categories(loader):
     parse = re.findall(CAT_PATTERN, web_page, re.UNICODE)
     categories = []
     for item in parse:
-        category = {}
-        category['name'] = item[0]
-        category['url'] = item[1]
-        category['items#'] = item[2]
-        categories.append(category)
+        categories.append({'name': item[0], 'url': item[1], 'items#': item[2]})
     return categories
 
 
@@ -79,7 +83,7 @@ def get_videos(category_url, loader, page=0, pages='25'):
         pageNo = '&p=' + str(page)
     else:
         pageNo = ''
-    if  '?r=' not in category_url:
+    if '?r=' not in category_url:
         page_count = ''
     else:
         page_count = '&per=' + pages
@@ -96,7 +100,7 @@ def get_videos(category_url, loader, page=0, pages='25'):
                 url = link_tag['href']
                 image_tag = content_cell.find('img')
                 if image_tag is not None:
-                    thumb = image_tag['src'][:-3] + '200'
+                    thumb = image_tag['src'][:-3] + IMG_QUALITY
                     title = image_tag['alt']
                 else:
                     thumb = ''
@@ -138,17 +142,17 @@ def get_video_details(url, loader):
         duration
         plot
     """
-    details = {}
-    details['videos'] = []
+    details = {'videos': []}
     web_page = loader.get_page(SITE + url)
     __log__('exua_parser.get_video_details; web_page', web_page)
     soup = BeautifulSoup(web_page)
     if u'Артисты @ EX.UA' in soup.find('title').text:
         details['title'] = soup.find('meta', {'name': 'title'})['content']
         details['plot'] = soup.find('div', id="content_page").get_text(' ', strip=True)
-        details['thumb'] = soup.find('link', rel='image_src')['href']
+        details['thumb'] = soup.find('link', rel='image_src')['href'][:-3] + IMG_QUALITY
         video_url = re.search('playlist: \[ \"(.*?)\" \]',
-                        soup.find('script', {'type':'text/javascript'}, text=re.compile('playlist')).text).group(1)
+                              soup.find('script', {'type': 'text/javascript'}, text=re.compile('playlist')).text).group(
+            1)
         details['videos'].append({'filename': 'Video', 'url': video_url})
         details['year'] = details['genre'] = details['director'] = details['duration'] = details['cast'] = ''
         details['flvs'] = []
@@ -156,17 +160,14 @@ def get_video_details(url, loader):
         details['title'] = soup.find('h1').text
         thumb_tag = soup.find('link', rel='image_src')
         if thumb_tag is not None:
-            details['thumb'] = thumb_tag['href']
+            details['thumb'] = thumb_tag['href'][:-3] + IMG_QUALITY
         else:
             details['thumb'] = ''
-        search_video = soup.find_all('a',
-                        title=re.compile('(.*\.(?:avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|'
-                                                'AVI|MKV|TS|M2TS|MP4|M4V|FLV|VOB|MPG|MPEG|ISO|MOV|WMV|RAR|ZIP)(?!.))'))
+        search_video = soup.find_all('a', title=re.compile(
+            '(.*\.(?:avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|'
+            'AVI|MKV|TS|M2TS|MP4|M4V|FLV|VOB|MPG|MPEG|ISO|MOV|WMV|RAR|ZIP)(?!.))'))
         for video in search_video:
-            item = {}
-            item['filename'] = video.text
-            item['url'] = video['href']
-            details['videos'].append(item)
+            details['videos'].append({'filename': video.text, 'url': video['href']})
         search_script = soup.find_all('script')
         for script in search_script:
             var_player_list = re.search('player_list = \'(.*)\';', script.text)
@@ -178,23 +179,23 @@ def get_video_details(url, loader):
         else:
             details['flvs'] = ''
         DETAILS = {
-                    'year': [u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]ік).*?: *?([0-9]{4})', '([0-9]{4})'],
-                    'genre': [u'[Жж]анр.*', u'[Жж]анр.*?: *?(.*)', '.*'],
-                    'director': [u'[Рр]ежисс?[её]р.*', u'[Рр]ежисс?[её]р.*?: *?(.*)', '(.*)'],
-                    'duration': [u'Продолжительность.*', u'Продолжительность.*?: *?(.*)', '(.*)'],
-                    'plot': [u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*',
-                                u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*?: *?(.*)', '(.*)'],
-                    'cast': [u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '.*'],
-                    }
+            'year': [u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]ік).*?: *?([0-9]{4})', '([0-9]{4})'],
+            'genre': [u'[Жж]анр.*', u'[Жж]анр.*?: *?(.*)', '.*'],
+            'director': [u'[Рр]ежисс?[её]р.*', u'[Рр]ежисс?[её]р.*?: *?(.*)', '(.*)'],
+            'duration': [u'Продолжительность.*', u'Продолжительность.*?: *?(.*)', '(.*)'],
+            'plot': [u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*',
+                     u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*?: *?(.*)', '(.*)'],
+            'cast': [u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '.*'],
+        }
         for detail in DETAILS.keys():
-            search_detail =  soup.find(text=re.compile(DETAILS[detail][0], re.UNICODE))
+            search_detail = soup.find(text=re.compile(DETAILS[detail][0], re.UNICODE))
             if search_detail is not None:
                 detail_text = re.search(DETAILS[detail][1], search_detail, re.UNICODE)
                 if detail_text is not None:
                     text = detail_text.group(1)
                 if detail_text is None or len(text) <= 3:
                     while True:
-                        next_= search_detail.find_next(text=True)
+                        next_ = search_detail.find_next(text=True)
                         text_group = re.search(DETAILS[detail][2], next_, re.UNICODE)
                         if text_group is not None:
                             text = text_group.group(0)
@@ -248,6 +249,7 @@ def main():
     loader = WebLoader()
     details = get_video_details('/72967731?r=1988,23775', loader)
     print details
+
 
 if __name__ == '__main__':
     main()
