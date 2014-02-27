@@ -213,4 +213,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# Pycharm project config dir
 .idea
