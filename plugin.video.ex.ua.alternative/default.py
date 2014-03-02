@@ -318,8 +318,7 @@ def bookmarks():
         login_dialog = login_window.LoginWindow(username, password, captcha['captcha_file'])
         if not login_dialog.login_cancelled:
             successful_login = loader.login(login_dialog.username, login_dialog.password,
-                                            login_dialog.remember_user, login_dialog.captcha_text,
-                                            captcha['captcha_id'])
+                                            captcha_text=login_dialog.captcha_text, captcha_id=captcha['captcha_id'])
             if successful_login:
                 plugin.addon.setSetting('username', login_dialog.username)
                 if plugin.addon.getSetting('save_pass') == 'true':
