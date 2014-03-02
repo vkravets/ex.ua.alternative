@@ -34,7 +34,7 @@ class WebLoader(object):
         Class constructor.
         Prepare a cookie jar and a web-page opener.
         """
-        self.cookie_file = os.path.join(_cookie_dir, '.cookies')
+        self.cookie_file = os.path.join(_cookie_dir, '.cookies').decode('utf-8')
         self.cookie_jar = cookielib.LWPCookieJar(self.cookie_file)
         if not os.path.exists(self.cookie_file):
             self.cookie_jar.save()
