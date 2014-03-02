@@ -218,3 +218,5 @@ pip-log.txt
 .idea/
 # Exclude zip files
 *.zip
+# Exclude diff pattch files
+*.patch
