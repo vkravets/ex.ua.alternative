@@ -215,4 +215,6 @@ pip-log.txt
 .mr.developer.cfg
 
 # Pycharm project config dir
-.idea
+.idea/
+# Exclude zip files
+*.zip

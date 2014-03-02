@@ -19,8 +19,5 @@ def log(var_name='', variable=None):
             print u'plugin.video.ex.ua.alternative. %s:' % var_name, variable.encode('utf-8')
 
 
-def main():
-    pass
-
 if __name__ == '__main__':
-    main()
+    pass

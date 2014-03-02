@@ -10,7 +10,7 @@ import xbmcgui
 from SimpleDownloader import SimpleDownloader
 
 
-def main():
+if __name__ == '__main__':
     if sys.argv[1] == 'history':
         if xbmcgui.Dialog().yesno(u'Внимание!', u'Действительно очистить историю поиска?'):
             xbmcvfs.delete('special://profile/addon_data/plugin.video.ex.ua.alternative/.storage/storage')
@@ -26,7 +26,3 @@ def main():
         if download_path:
             params = {'url': 'http://www.ex.ua' + sys.argv[2], 'download_path': download_path, 'Title': u'Загрузка файла'}
             downloader.download(sys.argv[3].decode('utf-8'), params)
-
-
-if __name__ == '__main__':
-    main()

@@ -147,8 +147,5 @@ def decode(enc):
     return ''.join(dec)
 
 
-def main():
-    pass
-
 if __name__ == '__main__':
-    main()
+    pass
