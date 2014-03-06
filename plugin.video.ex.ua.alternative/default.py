@@ -7,6 +7,7 @@
 # Import standard modules
 import sys
 import urllib
+import urlparse
 import os
 # Import XBMC modules
 import xbmc
@@ -110,7 +111,7 @@ def list_categories(categories):
     listing = []
     for category in categories:
         item = {'label': category['name'] + ' [' + category['items#'] + ']',
-                'path': plugin.url_for('video_articles', mode='list', path=category['url'], page_No='0'),
+                'path': plugin.url_for('video_articles', mode='list', path=category['path'], page_No='0'),
                 'thumbnail': os.path.join(icons, 'video.png')
         }
         listing.append(item)
@@ -170,7 +171,7 @@ def list_videos(videos, path='', page=0):
         for video in videos['videos']:
             item = {'label': video['title'],
                     'thumbnail': video['thumb'],
-                    'path': plugin.url_for('display_path', path=video['url'])}
+                    'path': plugin.url_for('display_path', path=video['path'])}
             listing.append(item)
         if videos['next']:
             listing.append({'label': u'Вперед > ' + videos['next'],
@@ -201,7 +202,7 @@ def display_path(path):
         elif current_skin == 'skin.aeon.nox.5':
             view_mode = 55
     elif page_type == 'video_list':
-        listing = list_videos(contents)
+        listing = list_videos(contents, path=path)
     elif page_type == 'categories':
         listing = list_categories(contents)
     else:
@@ -214,14 +215,18 @@ def list_video_details(video_details):
     """
     Show video details.
     """
-    if plugin.addon.getSetting('prefer_lq') == 'true' and video_details['flvs']:
-        videos_list = []
-        for index in range(len(video_details['flvs'])):
-            videos_list.append({'filename': 'Video%s.flv' % str(index + 1), 'url': video_details['flvs'][index]})
-    else:
-        videos_list = video_details['videos']
     listing = []
-    for video in videos_list:
+    i = 0
+    for video in video_details['videos']:
+        if video['mirrors']:
+            mirrors = urllib.urlencode(video['mirrors'])
+        else:
+            mirrors = 'none'
+        try:
+            flv = video_details['flvs'][i]
+        except IndexError:
+            flv = 'none'
+        i += 1
         item = {'label': video['filename'],
                 'thumbnail': video_details['thumb'],
                 'info': {'title': video['filename'],
@@ -229,10 +234,14 @@ def list_video_details(video_details):
                          'director': video_details['director'],
                          'plot': video_details['plot']},
                 'is_playable': True,
-                'path': plugin.url_for('play_video', url=video['url']),
                 'context_menu': [(u'Загрузить файл…',
-                                  u'RunScript({path}/resources/lib/commands.py,download,{url},{filename})'.format(
-                                                path=addon_path, url=video['url'], filename=video['filename']))]}
+                u'RunScript({addon_path}/resources/lib/commands.py,download,{filename},{path},{mirrors},{flv})'.format(
+addon_path=addon_path, filename=urllib.quote_plus(video['filename'].encode('utf-8')), path=video['path'], mirrors=mirrors, flv=flv))]
+                }
+        if plugin.addon.getSetting('choose_mirrors') == 'true':
+            item['path'] = plugin.url_for('select_mirror', path=video['path'], mirrors=mirrors, flv=flv)
+        else:
+            item['path'] = plugin.url_for('play_video', path=video['path'])
         if video_details['year']:
             try:
                 item['info']['year'] = int(video_details['year'])
@@ -240,30 +249,48 @@ def list_video_details(video_details):
                 pass
         if video_details['cast']:
             item['info']['cast'] = video_details['cast'].split(', ')
-        # if video_details['duration']:
-        #     duration = video_details['duration'].split(':')
-        #     try:
-        #         item['info']['duration'] = str(int(duration[0]) * 60 + int(duration[1]))
-        #     except ValueError:
-        #         pass
+        if video_details['rating']:
+            try:
+                item['info']['rating'] = float(video_details['rating'])
+            except ValueError:
+                pass
         listing.append(item)
     return listing
 
 
-@plugin.route('/play/<url>')
-def play_video(url):
+@plugin.route('/play/<path>/<mirrors>/<flv>', name='select_mirror')
+@plugin.route('/play/<path>')
+def play_video(path, mirrors='', flv=''):
     """
     Play video.
     """
-    __log__('play_video; url', url)
-    if url[0] == '/':
-        url = 'http://www.ex.ua' + url
+    if mirrors and flv and plugin.addon.getSetting('choose_mirrors') == 'true':
+        if mirrors != 'none':
+            mirrors_list = urlparse.parse_qsl(mirrors)
+            menu_items = [u'Зеркало ' + item[0] for item in mirrors_list]
+            urls = [item[1] for item in mirrors_list]
+        else:
+            urls = []
+            menu_items = []
+        urls.insert(0, path)
+        menu_items.insert(0, u'Оригинальное видео')
+        if flv != 'none':
+            urls.append(flv)
+            menu_items.append(u'Облегченное видео (FLV)')
+        index = xbmcgui.Dialog().select(u'Выберите видео', menu_items)
+        if index >= 0:
+            path = urls[index]
+        else:
+            return None
     if plugin.addon.getSetting('authorization') == 'true' and loader.is_logged_in():
         cookies = '|Cookie=' + urllib.urlencode(loader.get_cookies())
     else:
         cookies = ''
+    if path[0] == '/':
+        path = 'http://www.ex.ua' + path
+    __log__('play_video; path', path)
     __log__('play_video; cookies', cookies)
-    plugin.set_resolved_url(url + cookies)
+    plugin.set_resolved_url(path + cookies)
 
 
 @plugin.route('/search_category/<path>')

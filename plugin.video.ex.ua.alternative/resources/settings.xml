@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
   <category label="Общие">
-    <setting id="prefer_lq" type="bool"
-        label="Предпочитать облегченное видео (при наличии)" default="false"/>
+    <setting id="choose_mirrors" type="bool"
+        label="Показывать диалог выбора вариантов видео" default="false"/>
     <setting id="hq_posters" type="bool"
         label="Постеры высокого качества" default="false"/>
     <setting type="sep" />

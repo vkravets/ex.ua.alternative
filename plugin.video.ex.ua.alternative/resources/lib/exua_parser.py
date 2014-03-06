@@ -73,11 +73,10 @@ def parse_categories(web_page):
     url
     items# (items count)
     """
-    CAT_PATTERN = '<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>'
-    parse = re.findall(CAT_PATTERN, web_page, re.UNICODE)
+    parse = re.findall('<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>', web_page, re.UNICODE)
     categories = []
     for item in parse:
-        categories.append({'name': item[0], 'url': item[1], 'items#': item[2]})
+        categories.append({'name': item[0], 'path': item[1], 'items#': item[2]})
     __log__('exua_parser.get_categories; categories', categories)
     return categories
 
@@ -94,14 +93,16 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         next: numbers of next pages, if any.
     """
     if page > 0:
-        pageNo = '&p=' + str(page)
+        pageNo = '?p=' + str(page)
     else:
         pageNo = ''
-    if '?r=' in path or 'search' in path:
-        page_count = '&per=' + pages
+    if path != '/buffer':
+        page_count = '?per=' + pages
     else:
         page_count = ''
-    web_page = page_loader.get_page(SITE + path + pageNo + page_count)
+    url = SITE + path + pageNo + page_count
+    web_page = page_loader.get_page(url)
+    __log__('exua_parser.get_videos; url', url)
     __log__('exua_parser.get_videos; web_page', web_page)
     return parse_videos(web_page)
 
@@ -112,7 +113,7 @@ def parse_videos(web_page):
     Return the dictionary:
         videos: the list of videos, each item is a dict of the following properties:
             thumb
-            url
+            path
             title
         prev: numbers of previous pages, if any.
         next: numbers of next pages, if any.
@@ -125,7 +126,7 @@ def parse_videos(web_page):
         for content_cell in content_cells:
             try:
                 link_tag = content_cell.find('a')
-                url = link_tag['href']
+                path = link_tag['href']
                 image_tag = content_cell.find('img')
                 if image_tag is not None:
                     thumb = image_tag['src'][:-3] + IMG_QUALITY
@@ -136,7 +137,7 @@ def parse_videos(web_page):
             except TypeError:
                 continue
             else:
-                videos.append({'thumb': thumb, 'url': url, 'title': title})
+                videos.append({'thumb': thumb, 'path': path, 'title': title})
         nav_table = soup.find('table', cellpadding='5')
         if nav_table is not None:
             prev_tag = nav_table.find('img', alt=re.compile(u'предыдущую', re.UNICODE))
@@ -197,9 +198,9 @@ def parse_video_details(web_page):
         details['title'] = soup.find('meta', {'name': 'title'})['content']
         details['plot'] = soup.find('div', id="content_page").get_text(' ', strip=True)
         details['thumb'] = soup.find('link', rel='image_src')['href'][:-3] + IMG_QUALITY
-        video_url = re.search('playlist: \[ \"(.*?)\" \]',
+        video_path = re.search('playlist: \[ \"(.*?)\" \]',
                           soup.find('script', {'type': 'text/javascript'}, text=re.compile('playlist')).text).group(1)
-        details['videos'].append({'filename': 'Video', 'url': video_url})
+        details['videos'].append({'filename': 'Video', 'path': video_path})
         details['year'] = details['genre'] = details['director'] = details['duration'] = details['cast'] = ''
         details['flvs'] = []
     else:
@@ -213,29 +214,29 @@ def parse_video_details(web_page):
             '(.*\.(?:avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|'
             'AVI|MKV|TS|M2TS|MP4|M4V|FLV|VOB|MPG|MPEG|ISO|MOV|WMV|RAR|ZIP)(?!.))'))
         for video_tag in video_tags:
-            # mirror_tags = video_tag.find_next('td', {'class': 'small'}).find_all('a', {'rel': 'nofollow', 'title': True})
-            # mirrors = []
-            # if mirror_tags:
-            #     for mirror_tag in mirror_tags:
-            #         mirrors.append({'name': mirror_tag.text, 'path': mirror_tag['href']})
-            details['videos'].append({'filename': video_tag.text, 'url': video_tag['href']})
-        for script in soup.find_all('script'):
-            var_player_list = re.search('player_list = \'(.*)\';', script.text)
-            if var_player_list is not None:
-                details['flvs'] = []
-                for flv_item in ast.literal_eval('[' + var_player_list.group(1) + ']'):
-                    details['flvs'].append(flv_item['url'])
-                break
+            mirror_tags = video_tag.find_next('td', {'class': 'small'}).find_all('a', {'rel': 'nofollow', 'title': True})
+            mirrors = []
+            if mirror_tags:
+                for mirror_tag in mirror_tags:
+                    mirrors.append((mirror_tag.text, mirror_tag['href']))
+            details['videos'].append({'filename': video_tag.text, 'path': video_tag['href'], 'mirrors': mirrors})
+        flvs = re.compile('player_list = \'(.*)\';')
+        var_player_list = soup.find('script', text=flvs)
+        if var_player_list is not None:
+            details['flvs'] = []
+            for flv_item in ast.literal_eval('[' + re.search(flvs, var_player_list.text).group(1) + ']'):
+                details['flvs'].append(flv_item['url'])
         else:
             details['flvs'] = ''
         DETAILS = {
-            'year': [u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]ік).*?: *?([0-9]{4})', '([0-9]{4})'],
+            'year': [u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]ік).*?: *?(\d{4})', '(\d{4})'],
             'genre': [u'[Жж]анр.*', u'[Жж]анр.*?: *?(.*)', '.*'],
             'director': [u'[Рр]ежисс?[её]р.*', u'[Рр]ежисс?[её]р.*?: *?(.*)', '(.*)'],
             'duration': [u'Продолжительность.*', u'Продолжительность.*?: *?(.*)', '(.*)'],
             'plot': [u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*',
                      u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*?: *?(.*)', '(.*)'],
-            'cast': [u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '.*'],
+            'cast': [u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '(.*)'],
+            'rating': [u'IMD[Bb].*', u'IMD[Bb].*?: *?(\d\.\d)', '(\d\.\d)']
         }
         for detail in DETAILS.keys():
             search_detail = soup.find(text=re.compile(DETAILS[detail][0], re.UNICODE))
@@ -251,7 +252,7 @@ def parse_video_details(web_page):
                             text = text_group.group(0)
                         else:
                             text = ''
-                        if len(text) > 3:
+                        if len(text) > 2:
                             break
                         else:
                             search_detail = next_
@@ -275,6 +276,11 @@ def parse_video_details(web_page):
 
 
 def check_page(path):
+    """
+    Check page type by common patterns.
+    Return page type and its parsed contents depending on the type.
+    """
+    __log__('exua_parser.check_page; path', path)
     web_page = loader.get_page(SITE + path)
     try:
         if re.search(u'Файлы:', web_page, re.UNICODE) is not None:
@@ -300,3 +306,6 @@ def check_page(path):
 
 if __name__ == '__main__':
     pass
+    details = get_video_details('/76539041?r=2,23775')
+    for key in details.keys():
+        print('%s: %s' % (key, details[key]))
