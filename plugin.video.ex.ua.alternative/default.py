@@ -146,11 +146,7 @@ def video_articles(path, page_No='0'):
     else:
         videos = exua_parser.get_videos(path, page=page, pages=pages)
     listing = list_videos(videos, path, page)
-    if page_No == '0':
-        listing.insert(0, {'label': u'[Поиск…]',
-                           'path': plugin.url_for('search_category', path=path),
-                           'thumbnail': os.path.join(icons, 'search.png')})
-    else:
+    if page_No != '0':
         listing.insert(0, {'label': u'<< Главная',
                            'path': plugin.url_for('categories'),
                            'thumbnail': os.path.join(icons, 'home.png')})
@@ -177,6 +173,10 @@ def list_videos(videos, path='', page=0):
             listing.append({'label': u'Вперед > ' + videos['next'],
                             'path': plugin.url_for('video_articles', path=path, page_No=str(page + 1)),
                             'thumbnail': os.path.join(icons, 'next.png')})
+        if path in SEARCH_CATEGORIES.keys() and page == 0:
+            listing.insert(0, {'label': u'[Поиск…]',
+                           'path': plugin.url_for('search_category', path=path),
+                           'thumbnail': os.path.join(icons, 'search.png')})
     return listing
 
 
@@ -193,14 +193,15 @@ def display_path(path):
     view_mode = 50
     if page_type == 'video_page':
         listing = list_video_details(contents)
-        # Switch view based on a current skin.
-        current_skin = xbmc.getSkinDir()
-        if current_skin == 'skin.confluence' or current_skin == 'skin.confluence-plood':
-            view_mode = 503
-        elif current_skin == 'skin.aeon.nox':
-            view_mode = 52
-        elif current_skin == 'skin.aeon.nox.5':
-            view_mode = 55
+        if plugin.addon.getSetting('use_skin_info') == 'true':
+            # Switch view based on a current skin.
+            current_skin = xbmc.getSkinDir()
+            if current_skin == 'skin.confluence' or current_skin == 'skin.confluence-plood':
+                view_mode = 503
+            elif current_skin == 'skin.aeon.nox':
+                view_mode = 52
+            elif current_skin == 'skin.aeon.nox.5':
+                view_mode = 55
     elif page_type == 'video_list':
         listing = list_videos(contents, path=path)
     elif page_type == 'categories':
@@ -229,6 +230,7 @@ def list_video_details(video_details):
         i += 1
         item = {'label': video['filename'],
                 'thumbnail': video_details['thumb'],
+                'path': plugin.url_for('select_mirror', path=video['path'], mirrors=mirrors, flv=flv),
                 'info': {'title': video['filename'],
                          'genre': video_details['genre'],
                          'director': video_details['director'],
@@ -236,17 +238,14 @@ def list_video_details(video_details):
                 'is_playable': True,
                 'context_menu': [(u'Загрузить файл…',
                 u'RunScript({addon_path}/resources/lib/commands.py,download,{filename},{path},{mirrors},{flv})'.format(
-addon_path=addon_path, filename=urllib.quote_plus(video['filename'].encode('utf-8')), path=video['path'], mirrors=mirrors, flv=flv))]
+                    addon_path=addon_path, filename=urllib.quote_plus(video['filename'].encode('utf-8')),
+                        path=video['path'], mirrors=mirrors, flv=flv)),
+                                (u'Просмотрено/не просмотрено', 'Action(ToggleWatched)')]
                 }
-        if plugin.addon.getSetting('choose_mirrors') == 'true':
-            item['path'] = plugin.url_for('select_mirror', path=video['path'], mirrors=mirrors, flv=flv)
-        else:
-            item['path'] = plugin.url_for('play_video', path=video['path'])
-        if video_details['year']:
-            try:
-                item['info']['year'] = int(video_details['year'])
-            except ValueError:
-                pass
+        try:
+            item['info']['year'] = int(video_details['year'])
+        except ValueError:
+            pass
         if video_details['cast']:
             item['info']['cast'] = video_details['cast'].split(', ')
         if video_details['rating']:

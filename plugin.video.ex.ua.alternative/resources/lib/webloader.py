@@ -22,7 +22,7 @@ if __name__ == '__main__':
 else: # If the module is imported during normal plugin run.
     import xbmc
     from logger import log as __log__
-    _cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.alternative')
+    _cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.alternative').decode('utf-8')
 
 LOGIN_URL = 'https://www.ex.ua/login'
 
@@ -34,7 +34,7 @@ class WebLoader(object):
         Class constructor.
         Prepare a cookie jar and a web-page opener.
         """
-        self.cookie_file = os.path.join(_cookie_dir, '.cookies').decode('utf-8')
+        self.cookie_file = os.path.join(_cookie_dir, '.cookies')
         self.cookie_jar = cookielib.LWPCookieJar(self.cookie_file)
         if not os.path.exists(self.cookie_file):
             self.cookie_jar.save()
@@ -90,7 +90,7 @@ class WebLoader(object):
         with 'captcha_id' and 'captcha_file' keys.
         """
         web_page = self.get_page(LOGIN_URL)
-        captcha_group = re.search('<img src=\'\/captcha\?captcha_id=(.+?)\'', web_page, re.UNICODE)
+        captcha_group = re.search('<img src=\'/captcha\?captcha_id=(.+?)\'', web_page, re.UNICODE)
         if captcha_group is not None:
             captcha_id = captcha_group.group(1)
             captcha_file = os.path.join(_cookie_dir, 'captcha.png')
