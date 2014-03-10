@@ -289,8 +289,7 @@ def play_video(path, mirrors='', flv=''):
         path = 'http://www.ex.ua' + path
     __log__('play_video; path', path)
     __log__('play_video; cookies', cookies)
-    plugin.set_resolved_url(path +
-                    '|User-Agent=Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0' + cookies)
+    plugin.set_resolved_url(path + cookies)
 
 
 @plugin.route('/search_category/<path>')
