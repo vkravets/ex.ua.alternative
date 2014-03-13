@@ -93,7 +93,7 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         next: numbers of next pages, if any.
     """
     if page > 0:
-        if '?r=' in path:
+        if '?r=' in path or '?s=' in path:
             p = '&p='
         else:
             p = '?p='
