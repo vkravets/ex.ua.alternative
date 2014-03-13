@@ -93,11 +93,15 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         next: numbers of next pages, if any.
     """
     if page > 0:
-        pageNo = '?p=' + str(page)
+        if '?r=' in path:
+            p = '&p='
+        else:
+            p = '?p='
+        pageNo = p + str(page)
     else:
         pageNo = ''
     if path != '/buffer':
-        page_count = '?per=' + pages
+        page_count = '&per=' + pages
     else:
         page_count = ''
     url = SITE + path + pageNo + page_count

@@ -263,30 +263,35 @@ def play_video(path, mirrors='', flv=''):
     """
     Play video.
     """
-    if mirrors and flv and plugin.addon.getSetting('choose_mirrors') == 'true':
-        if mirrors != 'none':
-            mirrors_list = urlparse.parse_qsl(mirrors)
-            menu_items = [u'Зеркало ' + item[0] for item in mirrors_list]
-            urls = [item[1] for item in mirrors_list]
-        else:
-            urls = []
-            menu_items = []
-        urls.insert(0, path)
-        menu_items.insert(0, u'Оригинальное видео')
-        if flv != 'none':
-            urls.append(flv)
-            menu_items.append(u'Облегченное видео (FLV)')
-        index = xbmcgui.Dialog().select(u'Выберите видео', menu_items)
-        if index >= 0:
-            path = urls[index]
-        else:
-            return None
+    if mirrors and flv:
+        if plugin.addon.getSetting('choose_mirrors') == '1':
+            if mirrors != 'none':
+                mirrors_list = urlparse.parse_qsl(mirrors)
+                menu_items = [u'Зеркало ' + item[0] for item in mirrors_list]
+                urls = [item[1] for item in mirrors_list]
+            else:
+                urls = []
+                menu_items = []
+            urls.insert(0, path)
+            menu_items.insert(0, u'Оригинальное видео')
+            if flv != 'none':
+                urls.append(flv)
+                menu_items.append(u'Облегченное видео (FLV)')
+            index = xbmcgui.Dialog().select(u'Выберите видео', menu_items)
+            if index >= 0:
+                path = urls[index]
+            else:
+                return None
+        elif plugin.addon.getSetting('choose_mirrors') == '2':
+            path = flv
     if plugin.addon.getSetting('authorization') == 'true' and loader.is_logged_in():
         cookies = '|Cookie=' + urllib.urlencode(loader.get_cookies())
     else:
         cookies = ''
     if path[0] == '/':
         path = 'http://www.ex.ua' + path
+        if plugin.addon.getSetting('direct_link') == 'true':
+            path = loader.get_direct_link(path)
     __log__('play_video; path', path)
     __log__('play_video; cookies', cookies)
     plugin.set_resolved_url(path + cookies)

@@ -125,6 +125,12 @@ class WebLoader(object):
         result_page = self.get_page(LOGIN_URL, post_data)
         return self.check_error(result_page)
 
+    def get_direct_link(self, url):
+        """Get direct link to a video file"""
+        sesion = self.opener.open(url)
+        resolved_url = sesion.geturl()
+        sesion.close()
+        return resolved_url
 
 def encode(clear):
     key = hashlib.md5(str(True)).hexdigest()

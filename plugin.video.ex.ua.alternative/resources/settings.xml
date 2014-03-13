@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
   <category label="Общие">
-    <setting id="choose_mirrors" type="bool"
-        label="Показывать диалог выбора вариантов видео" default="false"/>
+    <setting id="choose_mirrors" type="enum" values="По умолчанию|Диалог выбора|Облегченное видео (FLV)"
+        label="Выбор файла для воспроизведения" default="0"/>
     <setting id="hq_posters" type="bool"
         label="Постеры высокого качества" default="false"/>
     <setting id="savesearch" type="bool"
@@ -30,8 +30,10 @@
     <setting type="action"
         label="Удалить cookies (сброс авторизации)" action="RunScript($CWD/resources/lib/commands.py,cookies)" />
   </category>
-  <category label="Отладка">
+  <category label="Дополнительно">
     <setting id="debug" type="bool"
         label="Включить подробный журнал отладки" default="false"/>
+  <setting id="direct_link" type="bool"
+        label="Получать прямую ссылку на видеофайл" default="false"/>
   </category>
 </settings>
