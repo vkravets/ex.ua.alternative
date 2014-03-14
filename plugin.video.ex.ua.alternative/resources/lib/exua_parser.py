@@ -310,6 +310,3 @@ def check_page(path):
 
 if __name__ == '__main__':
     pass
-    details = get_video_details('/76539041?r=2,23775')
-    for key in details.keys():
-        print('%s: %s' % (key, details[key]))
