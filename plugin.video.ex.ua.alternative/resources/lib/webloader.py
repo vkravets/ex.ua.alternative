@@ -127,9 +127,13 @@ class WebLoader(object):
 
     def get_direct_link(self, url):
         """Get direct link to a video file"""
-        sesion = self.opener.open(url)
-        resolved_url = sesion.geturl()
-        sesion.close()
+        try:
+            sesion = self.opener.open(url)
+        except urllib2.URLError:
+            resolved_url = ''
+        else:
+            resolved_url = sesion.geturl()
+            sesion.close()
         return resolved_url
 
 def encode(clear):

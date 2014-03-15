@@ -292,6 +292,9 @@ def play_video(path, mirrors='', flv=''):
         path = 'http://www.ex.ua' + path
         if plugin.addon.getSetting('direct_link') == 'true':
             path = loader.get_direct_link(path)
+            if not path:
+                xbmc.executebuiltin(u'Notification(Ошибка!,Ссылка недоступна)'.encode('utf-8'))
+                return None
     __log__('play_video; path', path)
     __log__('play_video; cookies', cookies)
     plugin.set_resolved_url(path + cookies)

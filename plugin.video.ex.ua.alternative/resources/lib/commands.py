@@ -10,7 +10,6 @@ import urlparse
 import xbmcvfs
 import xbmcgui
 from SimpleDownloader import SimpleDownloader
-import webloader
 
 
 def clear_history():
@@ -57,8 +56,7 @@ def download_file():
             if index == len(menu_items) - 1:
                 filename = filename[:-3] + 'flv'
             else:
-                loader = webloader.WebLoader()
-                url = loader.get_direct_link('http://www.ex.ua' + url)
+                url = 'http://www.ex.ua' + url
             downloader = SimpleDownloader()
             params = {'url': url, 'download_path': download_path, 'Title': u'Загрузка файла'}
             downloader.download(filename, params)
