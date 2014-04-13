@@ -196,9 +196,9 @@ def display_path(path):
         if plugin.addon.getSetting('use_skin_info') == 'true':
             # Switch view based on a current skin.
             current_skin = xbmc.getSkinDir()
-            if current_skin == 'skin.confluence' or current_skin == 'skin.confluence-plood':
+            if current_skin in ('skin.confluence', 'skin.confluence-plood'):
                 view_mode = 503
-            elif current_skin == 'skin.aeon.nox':
+            elif current_skin in ('skin.aeon.nox', 'skin.aeon.nox.gotham'):
                 view_mode = 52
             elif current_skin == 'skin.aeon.nox.5':
                 view_mode = 55
@@ -305,6 +305,7 @@ def search_category(path):
     """
     Show search.
     """
+    listing = []
     keyboard = xbmc.Keyboard('', u'Поисковый запрос')
     keyboard.doModal()
     search_text = keyboard.getText()

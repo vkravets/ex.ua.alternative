@@ -284,6 +284,8 @@ def check_page(path):
     Check page type by common patterns.
     Return page type and its parsed contents depending on the type.
     """
+    page_type = 'unknown'
+    contents = None
     __log__('exua_parser.check_page; path', path)
     web_page = loader.get_page(SITE + path)
     try:
@@ -298,10 +300,6 @@ def check_page(path):
         elif re.search('<table width=100%.+?cellspacing=8', web_page, re.UNICODE) is not None:
             page_type = 'video_list'
             contents = parse_videos(web_page)
-            raise RuntimeError
-        else:
-            page_type = 'unknown'
-            contents = None
     except RuntimeError:
         pass
     __log__('exua_parser.check_page; page_type', page_type)
