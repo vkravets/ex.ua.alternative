@@ -288,20 +288,15 @@ def check_page(path):
     contents = None
     __log__('exua_parser.check_page; path', path)
     web_page = loader.get_page(SITE + path)
-    try:
-        if re.search(u'Файлы:', web_page, re.UNICODE) is not None:
-            page_type = 'video_page'
-            contents = parse_video_details(web_page)
-            raise RuntimeError
-        elif re.search(u'Видео на других языках', web_page, re.UNICODE) is not None:
-            page_type = 'categories'
-            contents = parse_categories(web_page)
-            raise RuntimeError
-        elif re.search('<table width=100%.+?cellspacing=8', web_page, re.UNICODE) is not None:
-            page_type = 'video_list'
-            contents = parse_videos(web_page)
-    except RuntimeError:
-        pass
+    if re.search(u'Файлы:', web_page, re.UNICODE) is not None:
+        page_type = 'video_page'
+        contents = parse_video_details(web_page)
+    elif re.search(u'Видео на других языках', web_page, re.UNICODE) is not None:
+        page_type = 'categories'
+        contents = parse_categories(web_page)
+    elif re.search('<table width=100%.+?cellspacing=8', web_page, re.UNICODE) is not None:
+        page_type = 'video_list'
+        contents = parse_videos(web_page)
     __log__('exua_parser.check_page; page_type', page_type)
     __log__('exua_parser.check_page; contents', contents)
     return page_type, contents
