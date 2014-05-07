@@ -5,4 +5,4 @@ ex.ua.alternative
 
 Примечание: данный сайт доступен только для жителей Украины.
 
-Готовый плагин можно скачать отсюда: https://cloud.mail.ru/public/1c3e9b253d03/plugin.video.ex.ua.alternative-2.0.3.zip
+Готовый плагин можно скачать отсюда: https://cloud.mail.ru/public/804f3e786a97/plugin.video.ex.ua.alternative-2.0.5.zip
