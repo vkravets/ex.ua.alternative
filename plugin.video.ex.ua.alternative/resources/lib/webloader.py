@@ -24,7 +24,7 @@ else: # If the module is imported during normal plugin run.
     from logger import log as __log__
     _cookie_dir = xbmc.translatePath('special://profile/addon_data/plugin.video.ex.ua.alternative').decode('utf-8')
 
-LOGIN_URL = 'https://www.ex.ua/login'
+LOGIN_URL = 'http://www.ex.ua/login'
 
 
 class WebLoader(object):
