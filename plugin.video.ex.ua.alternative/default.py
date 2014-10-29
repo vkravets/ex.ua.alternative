@@ -80,14 +80,14 @@ def get_categories():
     return exua_parser.get_categories()
 
 
-# Cache video list for 30 minutes
-@plugin.cached(30)
+# Cache video list for 20 minutes
+@plugin.cached(20)
 def get_videos(path, page, pages):
     return exua_parser.get_videos(path, page=page, pages=pages)
 
 
-# Cache checked page for 12 hours.
-@plugin.cached(60 * 12)
+# Cache checked page for 3 hours.
+@plugin.cached(60 * 3)
 def check_page(url):
     return exua_parser.check_page(url)
 
