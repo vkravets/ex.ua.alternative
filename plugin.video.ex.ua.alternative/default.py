@@ -362,6 +362,7 @@ def bookmarks():
                     plugin.addon.setSetting('password', '')
             else:
                 xbmcgui.Dialog().ok(u'Ошибка входа!', u'Проверьте логин и пароль, а затем повторите попытку.')
+        del login_dialog
     __log__('bookmarks; is_logged_in', loader.is_logged_in())
     __log__('bookmarks; successful_login', successful_login)
     if loader.is_logged_in() or successful_login:
