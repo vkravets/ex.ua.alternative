@@ -9,10 +9,10 @@ import xbmcaddon
 
 _addon = xbmcaddon.Addon()
 sys.path.append(_addon.getAddonInfo('path').decode('utf-8'))
-from pyxbmct.addonwindow import *
+import pyxbmct.addonwindow as pyxbmct
 
 
-class LoginWindow(AddonDialogWindow):
+class LoginWindow(pyxbmct.AddonDialogWindow):
     """ Login window class """
     def __init__(self, username='', password='', captcha=''):
         """ Class constructor """
@@ -31,29 +31,29 @@ class LoginWindow(AddonDialogWindow):
 
     def set_controls(self):
         """ Set UI controls """
-        username_label = Label(u'Имя пользователя:')
+        username_label = pyxbmct.Label(u'Имя пользователя:')
         self.placeControl(username_label, 0, 0)
-        self.username_entry = Edit(u'Введите имя пользователя')
+        self.username_entry = pyxbmct.Edit(u'Введите имя пользователя')
         self.placeControl(self.username_entry, 0, 1)
         self.username_entry.setText(self.username)
-        password_label = Label(u'Пароль:')
+        password_label = pyxbmct.Label(u'Пароль:')
         self.placeControl(password_label, 1, 0)
-        self.password_entry = Edit(u'Введите пароль', isPassword=True)
+        self.password_entry = pyxbmct.Edit(u'Введите пароль', isPassword=True)
         self.placeControl(self.password_entry, 1, 1)
         self.password_entry.setText(self.password)
-        self.captcha_image = Image(self.captcha)
+        self.captcha_image = pyxbmct.Image(self.captcha)
         self.placeControl(self.captcha_image, 2, 0, rowspan=2)
         self.captcha_image.setVisible(self.captcha_present)
-        captcha_label = Label(u'Текст на картинке:')
+        captcha_label = pyxbmct.Label(u'Текст на картинке:')
         self.placeControl(captcha_label, 2, 1)
         captcha_label.setVisible(self.captcha_present)
-        self.captcha_entry = Edit(u'Введите текст на картинке')
+        self.captcha_entry = pyxbmct.Edit(u'Введите текст на картинке')
         self.placeControl(self.captcha_entry, 3, 1)
         self.captcha_entry.setVisible(self.captcha_present)
-        self.cancel_button = Button(u'Отмена')
+        self.cancel_button = pyxbmct.Button(u'Отмена')
         self.placeControl(self.cancel_button, 4, 0)
         self.connect(self.cancel_button, self.close)
-        self.login_button = Button(u'Войти')
+        self.login_button = pyxbmct.Button(u'Войти')
         self.placeControl(self.login_button, 4, 1)
         self.connect(self.login_button, self.login)
 
