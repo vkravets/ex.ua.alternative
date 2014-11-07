@@ -4,11 +4,6 @@
 # Created:     18.02.2014
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
-import sys
-import xbmcaddon
-
-_addon = xbmcaddon.Addon()
-sys.path.append(_addon.getAddonInfo('path').decode('utf-8'))
 from pyxbmct.addonwindow import *
 
 
