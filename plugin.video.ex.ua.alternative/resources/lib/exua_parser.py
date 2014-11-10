@@ -60,7 +60,7 @@ def get_categories():
     url
     items# (items count)
     """
-    web_page = loader.get_page('http://www.ex.ua/ru/video')
+    web_page = loader.get_page('http://www.ex.ua/ru/video?per=24')
     __log__('exua_parser.get_categories; web_page', web_page)
     return parse_categories(web_page)
 
