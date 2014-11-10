@@ -38,7 +38,7 @@ def download_file():
     flv = sys.argv[5]
     if mirrors != 'none':
         mirrors_list = urlparse.parse_qsl(mirrors)
-        menu_items = [u'Зеркало ' + item[0] for item in mirrors_list]
+        menu_items = [u'Зеркало {0}'.format(item[0]) for item in mirrors_list]
         urls = [item[1] for item in mirrors_list]
     else:
         urls = []
