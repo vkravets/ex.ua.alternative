@@ -24,7 +24,9 @@ def get_history_length():
 
 
 def get_items_per_page():
-    """Function description"""
+    """
+    Get items per page as a string.
+    """
     return {'0': '25', '1': '50', '2': '75', '3': '100'}[plugin.addon.getSetting('itemcount')]
 
 
