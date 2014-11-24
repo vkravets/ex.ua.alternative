@@ -93,9 +93,9 @@ def list_categories(categories):
                 'thumbnail': os.path.join(icons, 'video.png')
         }
         listing.append(item)
-    listing.append({'label': u'[Поиск Bing]',
-                    'path': plugin.url_for('bing'),
-                    'thumbnail': os.path.join(icons, 'bing.png')})
+    listing.append({'label': u'[Поиск Google]',
+                    'path': plugin.url_for('google'),
+                    'thumbnail': os.path.join(icons, 'google.png')})
     if plugin.addon.getSetting('savesearch') == 'true':
         listing.append({'label': u'[История поиска]',
                         'path': plugin.url_for('search_history'),
@@ -283,11 +283,11 @@ def play_video(path, mirrors='', flv=''):
     plugin.set_resolved_url(path + cookies)
 
 
-@plugin.route('/bing/', name='bing')
+@plugin.route('/google/', name='google')
 @plugin.route('/search_category/<path>')
 def search_category(path=''):
     """
-    Perform search in an ex.ua category or via Bing.com.
+    Perform search in an ex.ua category or via Google.com.
     """
     listing = []
     keyboard = xbmc.Keyboard('', u'Поисковый запрос')
@@ -298,7 +298,7 @@ def search_category(path=''):
             search_path = '/search?s={query}&original_id={id_}'.format(
                                     query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
         else:
-            search_path = 'http://www.bing.com/search?q=site%3Aex.ua+{0}'.format(urllib.quote_plus(search_text))
+            search_path = 'http://www.google.com.ua/search?q=site%3Aex.ua+{0}'.format(urllib.quote_plus(search_text))
         __log__('search_category; search_path', search_path)
         if plugin.addon.getSetting('cache_pages') == 'true':
             videos = get_videos(search_path, page=0, pages=get_items_per_page())

@@ -27,6 +27,26 @@ else: # If the module is imported during normal plugin run.
 LOGIN_URL = 'http://www.ex.ua/login'
 
 
+class Opener(object):
+    """HTTP opener class"""
+    headers = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0'),
+               ('Accept-Charset', 'UTF-8'),
+               ('Accept', 'text/html'),
+               ('Connection', 'keep-alive')]
+
+    def __init__(self, handler=urllib2.BaseHandler(), host='www.ex.ua', language=''):
+        """Class constructor"""
+        self.opener = urllib2.build_opener(handler)
+        self.headers.append(('Host', host))
+        if language:
+            self.headers.append(('Accept-Language', language))
+        self.opener.addheaders = self.headers
+
+    def open(self, url, data=None):
+        """Open specified url and return a HTTP session object"""
+        return self.opener.open(url, data)
+
+
 class WebLoader(object):
 
     def __init__(self):
@@ -39,20 +59,14 @@ class WebLoader(object):
         if not os.path.exists(self.cookie_file):
             self.cookie_jar.save()
         self.cookie_jar.revert()
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie_jar))
-        self.opener.addheaders = [
-            ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0'),
-            ('Accept-Charset', 'UTF-8'),
-            ('Host', 'www.ex.ua'),
-            ('Accept', 'text/html'),
-            ('Connection', 'keep-alive')]
+        self.opener = Opener(handler=urllib2.HTTPCookieProcessor(self.cookie_jar))
 
     def get_page(self, url, data=None):
         """
         Load a web-page with a given url.
         """
         self.cookie_jar.load()
-        __log__('WebBot.get_page; cookies', self.get_cookies())
+        __log__('WebLoader.get_page; cookies', self.get_cookies())
         try:
             session = self.opener.open(url, data)
         except urllib2.URLError:
@@ -99,7 +113,7 @@ class WebLoader(object):
             captcha = {'captcha_id': captcha_id, 'captcha_file': captcha_file}
         else:
             captcha = {'captcha_id': '', 'captcha_file': ''}
-        __log__('WebBot.check_captcha; captcha', captcha)
+        __log__('WebLoader.check_captcha; captcha', captcha)
         return captcha
 
     def check_error(self, web_page):

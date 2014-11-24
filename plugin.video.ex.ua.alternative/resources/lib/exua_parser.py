@@ -43,10 +43,10 @@ if __name__ == '__main__':
 
 else:  # If the module is imported during normal plugin run within XBMC.
     import xbmcaddon
-    from webloader import WebLoader
+    from webloader import *
     from logger import log as __log__
     _addon = xbmcaddon.Addon()
-    bing_icon = os.path.join(_addon.getAddonInfo('path'), 'resources', 'icons', 'bing.png')
+    google_icon = os.path.join(_addon.getAddonInfo('path'), 'resources', 'icons', 'google.png')
     if _addon.getSetting('hq_posters') == 'true':
         IMG_QUALITY = '400'
     else:
@@ -96,7 +96,7 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         prev: numbers of previous pages, if any.
         next: numbers of next pages, if any.
     """
-    if 'www.bing.com' not in path:
+    if 'www.google.com.ua' not in path:
         if page > 0:
             if '?r=' in path or '?s=' in path:
                 p = '&p='
@@ -114,11 +114,11 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         results = parse_videos(web_page)
         __log__('exua_parser.get_videos; web_page', web_page)
     else:
-        first = ''
+        start = ''
         if page > 0:
-            first = '&first={0}'.format(10 * page + 1)
-        url = path + first
-        results = bing_search(url)
+            start = '&start={0}'.format(10 * page)
+        url = path + start
+        results = google_search(url)
     __log__('exua_parser.get_videos; url', url)
     return results
 
@@ -313,38 +313,33 @@ def check_page(path):
     return page_type, contents
 
 
-def bing_search(url):
+def google_search(url):
     """
-    Search videos on Bing.com
+    Search ex.ua videos on Google.com
     :param url:
     :return:
     """
-    __log__('exua_parser.bing_search; url', url)
+    __log__('exua_parser.google_search; url', url)
     videos = []
-    request = urllib2.Request(url, None,
-                              {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
-                              'Host': 'www.bing.com',
-                              'Accept': 'text/html',
-                              'Accept-Charset': 'UTF-8',
-                              'Accept-Language': 'en'})
+    opener = Opener(host='www.google.com.ua', language='uk-ua')
     try:
-        session = urllib2.urlopen(request)
+        session = opener.open(url)
     except urllib2.URLError:
         page = ''
     else:
         page = session.read().decode('utf-8')
         session.close()
     soup = BeautifulSoup(page)
-    results = soup.find_all('a', {'href': re.compile(SITE)})
+    results = soup.find_all('a', {'href': re.compile('^' + SITE)})
     for result in results:
-        videos.append({'thumb': bing_icon,
+        videos.append({'thumb': google_icon,
                        'path': result['href'].replace(SITE, ''),
                        'title': result.get_text()})
     prev = next_ = ''
-    prev_tag = soup.find('a', {'title': re.compile('Prev')})
+    prev_tag = soup.find('span', text=u'Назад')
     if prev_tag is not None:
         prev = '<'
-    next_tag = soup.find('a', {'title': re.compile('Next')})
+    next_tag = soup.find('span', text=u'Уперед')
     if next_tag is not None:
         next_ = '>'
     return {'videos': videos, 'prev': prev, 'next': next_}
