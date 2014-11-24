@@ -16,29 +16,6 @@ import xbmcgui
 from xbmcswift2 import Plugin
 
 
-# Numeric codes for search in video categories
-SEARCH_CATEGORIES = {'/ru/video/foreign?r=23775': '2',
-                     '/ru/video/our?r=23775': '70538',
-                     '/ru/video/foreign_series?r=23775': '1988',
-                     '/ru/video/our_series?r=23775': '422546',
-                     '/ru/video/cartoon?r=23775': '1989',
-                     '/ru/video/anime?r=23775': '23786',
-                     '/ru/video/documentary?r=23775': '1987',
-                     '/ru/video/trailer?r=23775': '1990',
-                     '/ru/video/clip?r=23775': '1991',
-                     '/ru/video/concert?r=23775': '70533',
-                     '/ru/video/show?r=23775': '28713',
-                     '/ru/video/training?r=23775': '28714',
-                     '/ru/video/sport?r=23775': '69663',
-                     '/ru/video/short?r=23775': '23785',
-                     '/ru/video/theater?r=23775': '70665',
-                     '/ru/video/sermon?r=23775': '371146',
-                     '/ru/video/commercial?r=23775': '371152',
-                     '/ru/video/mobile?r=23775': '607160',
-                     '/ru/video/artist?r=23775': '7513588',
-                     '/73427589?r=23775': '73427589'}
-
-
 def get_history_length():
     """
     Get history length as an integer.
@@ -60,6 +37,7 @@ sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
 import webloader
 import login_window
+from constants import *
 from logger import log as __log__
 # Create web loader instance.
 loader = webloader.WebLoader()
@@ -115,6 +93,9 @@ def list_categories(categories):
                 'thumbnail': os.path.join(icons, 'video.png')
         }
         listing.append(item)
+    listing.append({'label': u'[Поиск Bing]',
+                    'path': plugin.url_for('bing'),
+                    'thumbnail': os.path.join(icons, 'bing.png')})
     if plugin.addon.getSetting('savesearch') == 'true':
         listing.append({'label': u'[История поиска]',
                         'path': plugin.url_for('search_history'),
@@ -146,10 +127,10 @@ def video_articles(path, page_No='0'):
     else:
         videos = exua_parser.get_videos(path, page=page, pages=pages)
     listing = list_videos(videos, path, page)
-    if page_No != '0':
-        listing.insert(0, {'label': u'<< Главная',
-                           'path': plugin.url_for('categories'),
-                           'thumbnail': os.path.join(icons, 'home.png')})
+    # if page_No != '0':
+    # listing.insert(0, {'label': u'<< Главная',
+    #                    'path': plugin.url_for('categories'),
+    #                    'thumbnail': os.path.join(icons, 'home.png')})
     __log__('video_articles; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
@@ -158,7 +139,9 @@ def list_videos(videos, path='', page=0):
     """
     Create a list of video articles to browse.
     """
-    listing = []
+    listing = [{'label': u'<< Главная',
+                'path': plugin.url_for('categories'),
+                'thumbnail': os.path.join(icons, 'home.png')}]
     if videos['videos']:
         if videos['prev']:
             listing.append({'label': videos['prev'] + u' < Назад',
@@ -300,18 +283,22 @@ def play_video(path, mirrors='', flv=''):
     plugin.set_resolved_url(path + cookies)
 
 
+@plugin.route('/bing/', name='bing')
 @plugin.route('/search_category/<path>')
-def search_category(path):
+def search_category(path=''):
     """
-    Show search.
+    Perform search in an ex.ua category or via Bing.com.
     """
     listing = []
     keyboard = xbmc.Keyboard('', u'Поисковый запрос')
     keyboard.doModal()
     search_text = keyboard.getText()
     if search_text and keyboard.isConfirmed():
-        search_path = '/search?s={query}&original_id={id_}'.format(
+        if path:
+            search_path = '/search?s={query}&original_id={id_}'.format(
                                     query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
+        else:
+            search_path = 'http://www.bing.com/search?q=site%3Aex.ua+{0}'.format(urllib.quote_plus(search_text))
         __log__('search_category; search_path', search_path)
         if plugin.addon.getSetting('cache_pages') == 'true':
             videos = get_videos(search_path, page=0, pages=get_items_per_page())

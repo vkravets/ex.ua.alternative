@@ -4,13 +4,16 @@
 # Created:     04.02.2014
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
+import os
 import re
 import ast
+import urllib2
 from bs4 import BeautifulSoup
+from constants import MEDIA_EXTENSIONS
+
 
 if __name__ == '__main__':
     # This is for testing purposes when the module is run from console.
-    import urllib2
 
     IMG_QUALITY = '200'
 
@@ -43,6 +46,7 @@ else:  # If the module is imported during normal plugin run within XBMC.
     from webloader import WebLoader
     from logger import log as __log__
     _addon = xbmcaddon.Addon()
+    bing_icon = os.path.join(_addon.getAddonInfo('path'), 'resources', 'icons', 'bing.png')
     if _addon.getSetting('hq_posters') == 'true':
         IMG_QUALITY = '400'
     else:
@@ -92,23 +96,31 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         prev: numbers of previous pages, if any.
         next: numbers of next pages, if any.
     """
-    if page > 0:
-        if '?r=' in path or '?s=' in path:
-            p = '&p='
+    if 'www.bing.com' not in path:
+        if page > 0:
+            if '?r=' in path or '?s=' in path:
+                p = '&p='
+            else:
+                p = '?p='
+            pageNo = p + str(page)
         else:
-            p = '?p='
-        pageNo = p + str(page)
+            pageNo = ''
+        if path != '/buffer':
+            page_count = '&per={0}'.format(pages)
+        else:
+            page_count = ''
+        url = SITE + path + pageNo + page_count
+        web_page = page_loader.get_page(url)
+        results = parse_videos(web_page)
+        __log__('exua_parser.get_videos; web_page', web_page)
     else:
-        pageNo = ''
-    if path != '/buffer':
-        page_count = '&per=' + pages
-    else:
-        page_count = ''
-    url = SITE + path + pageNo + page_count
-    web_page = page_loader.get_page(url)
+        first = ''
+        if page > 0:
+            first = '&first={0}'.format(10 * page + 1)
+        url = path + first
+        results = bing_search(url)
     __log__('exua_parser.get_videos; url', url)
-    __log__('exua_parser.get_videos; web_page', web_page)
-    return parse_videos(web_page)
+    return results
 
 
 def parse_videos(web_page):
@@ -214,9 +226,7 @@ def parse_video_details(web_page):
             details['thumb'] = thumb_tag['href'][:-3] + IMG_QUALITY
         else:
             details['thumb'] = ''
-        video_tags = soup.find_all('a', title=re.compile(
-            '(.*\.(?:avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|'
-            'AVI|MKV|TS|M2TS|MP4|M4V|FLV|VOB|MPG|MPEG|ISO|MOV|WMV|RAR|ZIP)(?!.))'))
+        video_tags = soup.find_all('a', title=re.compile('(.*\.(?:{0})(?!.))'.format(MEDIA_EXTENSIONS)))
         for video_tag in video_tags:
             mirror_tags = video_tag.find_next('td', {'class': 'small'}).find_all('a', {'rel': 'nofollow', 'title': True})
             mirrors = []
@@ -288,6 +298,7 @@ def check_page(path):
     contents = None
     __log__('exua_parser.check_page; path', path)
     web_page = loader.get_page(SITE + path)
+    __log__('exua_parser.check_page; page', web_page)
     if re.search(u'Файлы:', web_page, re.UNICODE) is not None:
         page_type = 'video_page'
         contents = parse_video_details(web_page)
@@ -300,6 +311,44 @@ def check_page(path):
     __log__('exua_parser.check_page; page_type', page_type)
     __log__('exua_parser.check_page; contents', contents)
     return page_type, contents
+
+
+def bing_search(url):
+    """
+    Search videos on Bing.com
+    :param url:
+    :return:
+    """
+    __log__('exua_parser.bing_search; url', url)
+    videos = []
+    request = urllib2.Request(url, None,
+                              {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
+                              'Host': 'www.bing.com',
+                              'Accept': 'text/html',
+                              'Accept-Charset': 'UTF-8',
+                              'Accept-Language': 'en'})
+    try:
+        session = urllib2.urlopen(request)
+    except urllib2.URLError:
+        page = ''
+    else:
+        page = session.read().decode('utf-8')
+        session.close()
+    soup = BeautifulSoup(page)
+    results = soup.find_all('a', {'href': re.compile(SITE)})
+    for result in results:
+        videos.append({'thumb': bing_icon,
+                       'path': result['href'].replace(SITE, ''),
+                       'title': result.get_text()})
+    prev = next_ = ''
+    prev_tag = soup.find('a', {'title': re.compile('Prev')})
+    if prev_tag is not None:
+        prev = '<'
+    next_tag = soup.find('a', {'title': re.compile('Next')})
+    if next_tag is not None:
+        next_ = '>'
+    return {'videos': videos, 'prev': prev, 'next': next_}
+
 
 if __name__ == '__main__':
     pass

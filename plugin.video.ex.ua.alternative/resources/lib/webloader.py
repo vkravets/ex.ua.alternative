@@ -44,7 +44,7 @@ class WebLoader(object):
             ('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0'),
             ('Accept-Charset', 'UTF-8'),
             ('Host', 'www.ex.ua'),
-            ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
+            ('Accept', 'text/html'),
             ('Connection', 'keep-alive')]
 
     def get_page(self, url, data=None):
@@ -107,10 +107,7 @@ class WebLoader(object):
         Check if there is an error image on a web-page,
         Returns True if there is no error, and False if the error image is present.
         """
-        if re.search('i_error.png', web_page) is None:
-            return True
-        else:
-            return False
+        return re.search('i_error.png', web_page) is None
 
     def login(self, username, password, remember_user=True, captcha_text='', captcha_id=''):
         """
@@ -135,6 +132,7 @@ class WebLoader(object):
             resolved_url = sesion.geturl()
             sesion.close()
         return resolved_url
+
 
 def encode(clear):
     key = hashlib.md5(str(True)).hexdigest()
