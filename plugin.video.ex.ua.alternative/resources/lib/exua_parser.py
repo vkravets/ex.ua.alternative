@@ -216,9 +216,10 @@ def parse_video_details(web_page):
         details['thumb'] = soup.find('link', rel='image_src')['href'][:-3] + IMG_QUALITY
         video_path = re.search('playlist: \[ \"(.*?)\" \]',
                           soup.find('script', {'type': 'text/javascript'}, text=re.compile('playlist')).text).group(1)
-        details['videos'].append({'filename': 'Video', 'path': video_path})
+        details['videos'].append({'filename': 'Video', 'path': video_path, 'mirrors': []})
         details['year'] = details['genre'] = details['director'] = details['duration'] = details['cast'] = ''
         details['flvs'] = []
+        details['rating'] = ''
     else:
         details['title'] = soup.find('h1').text
         thumb_tag = soup.find('link', rel='image_src')
