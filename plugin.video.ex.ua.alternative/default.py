@@ -34,7 +34,7 @@ def get_items_per_page():
 plugin = Plugin()
 addon_path = plugin.addon.getAddonInfo('path').decode('utf-8')
 icons = os.path.join(addon_path, 'resources', 'icons')
-# Import custom module.
+# Import custom modules.
 sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
 import webloader
@@ -43,7 +43,7 @@ from constants import SEARCH_CATEGORIES
 from logger import log as __log__
 # Create web loader instance.
 loader = webloader.WebLoader()
-# Create persistent storage for history.
+# Create a persistent storage for search history.
 storage = plugin.get_storage('storage')
 if plugin.addon.getSetting('savesearch') == 'true':
     # Create search_history storage if not exists.
