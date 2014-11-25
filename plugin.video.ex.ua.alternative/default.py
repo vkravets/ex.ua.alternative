@@ -204,10 +204,6 @@ def video_articles(path, page_No='0'):
     else:
         videos = exua_parser.get_videos(path, page=page, pages=pages)
     listing = list_videos(videos, path, page)
-    # if page_No != '0':
-    # listing.insert(0, {'label': u'<< Главная',
-    #                    'path': plugin.url_for('categories'),
-    #                    'thumbnail': os.path.join(icons, 'home.png')})
     __log__('video_articles; listing', listing)
     return plugin.finish(listing, view_mode=50)
 

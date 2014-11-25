@@ -9,7 +9,7 @@ import re
 import ast
 import urllib2
 from bs4 import BeautifulSoup
-from constants import MEDIA_EXTENSIONS
+from constants import MEDIA_EXTENSIONS, VIDEO_DETAILS
 
 
 if __name__ == '__main__':
@@ -243,26 +243,16 @@ def parse_video_details(web_page):
                 details['flvs'].append(flv_item['url'])
         else:
             details['flvs'] = ''
-        DETAILS = {
-            'year': (u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]ік).*?: *?(\d{4})', '(\d{4})'),
-            'genre': (u'[Жж]анр.*', u'[Жж]анр.*?: *?(.*)', '.*'),
-            'director': (u'[Рр]ежисс?[её]р.*', u'[Рр]ежисс?[её]р.*?: *?(.*)', '(.*)'),
-            'duration': (u'Продолжительность.*', u'Продолжительность.*?: *?(.*)', '(.*)'),
-            'plot': (u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*',
-                     u'(?:Описание|О фильме|Сюжет|О чем|О сериале).*?: *?(.*)', '(.*)'),
-            'cast': (u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '(.*)'),
-            'rating': (u'IMD[Bb].*', u'IMD[Bb].*?: *?(\d\.\d)', '(\d\.\d)')
-        }
-        for detail in DETAILS.keys():
-            search_detail = soup.find(text=re.compile(DETAILS[detail][0], re.UNICODE))
+        for detail in VIDEO_DETAILS.keys():
+            search_detail = soup.find(text=re.compile(VIDEO_DETAILS[detail][0], re.UNICODE))
             if search_detail is not None:
-                detail_text = re.search(DETAILS[detail][1], search_detail, re.UNICODE)
+                detail_text = re.search(VIDEO_DETAILS[detail][1], search_detail, re.UNICODE)
                 if detail_text is not None:
                     text = detail_text.group(1)
                 if detail_text is None or len(text) <= 3:
                     while True:
                         next_ = search_detail.find_next(text=True)
-                        text_group = re.search(DETAILS[detail][2], next_, re.UNICODE)
+                        text_group = re.search(VIDEO_DETAILS[detail][2], next_, re.UNICODE)
                         if text_group is not None:
                             text = text_group.group(0)
                         else:
