@@ -39,6 +39,7 @@ sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
 import webloader
 import login_window
+import views
 from constants import SEARCH_CATEGORIES
 from logger import log as __log__
 # Create web loader instance.
@@ -71,113 +72,6 @@ def get_videos(path, page, pages):
 def check_page(url):
     return exua_parser.check_page(url)
 
-#Create views
-
-def list_categories(categories):
-    """
-    Create a list of video categories form ex.ua
-    """
-    listing = []
-    for category in categories:
-        item = {'label': category['name'] + ' [' + category['items#'] + ']',
-                'path': plugin.url_for('video_articles', mode='list', path=category['path'], page_No='0'),
-                'thumbnail': os.path.join(icons, 'video.png')
-        }
-        listing.append(item)
-    listing.append({'label': u'[Поиск Google]',
-                    'path': plugin.url_for('google'),
-                    'thumbnail': os.path.join(icons, 'google.png')})
-    if plugin.addon.getSetting('savesearch') == 'true':
-        listing.append({'label': u'[История поиска]',
-                        'path': plugin.url_for('search_history'),
-                        'thumbnail': os.path.join(icons, 'search.png')})
-    if plugin.addon.getSetting('authorization') == 'true':
-        if loader.is_logged_in():
-            label = u'[Мои запомненные]'
-            thumbnail = os.path.join(icons, 'bookmarks.png')
-        else:
-            label = u'[Войти на ex.ua]'
-            thumbnail = os.path.join(icons, 'key.png')
-        listing.append({'label': label,
-                        'path': plugin.url_for('bookmarks'),
-                        'thumbnail': thumbnail})
-    __log__('categories; listing', listing)
-    return listing
-
-
-def list_videos(videos, path='', page=0):
-    """
-    Create a list of video articles to browse.
-    """
-    listing = [{'label': u'<< Главная',
-                'path': plugin.url_for('categories'),
-                'thumbnail': os.path.join(icons, 'home.png')}]
-    if videos['videos']:
-        if videos['prev']:
-            listing.append({'label': videos['prev'] + u' < Назад',
-                            'path': plugin.url_for('video_articles', path=path, page_No=str(page - 1)),
-                            'thumbnail': os.path.join(icons, 'previous.png')})
-        for video in videos['videos']:
-            item = {'label': video['title'],
-                    'thumbnail': video['thumb'],
-                    'path': plugin.url_for('display_path', path=video['path'])}
-            listing.append(item)
-        if videos['next']:
-            listing.append({'label': u'Вперед > ' + videos['next'],
-                            'path': plugin.url_for('video_articles', path=path, page_No=str(page + 1)),
-                            'thumbnail': os.path.join(icons, 'next.png')})
-        if path in SEARCH_CATEGORIES.keys() and page == 0:
-            listing.insert(0, {'label': u'[Поиск…]',
-                           'path': plugin.url_for('search_category', path=path),
-                           'thumbnail': os.path.join(icons, 'search.png')})
-    return listing
-
-
-def list_video_details(video_details):
-    """
-    Show video details.
-    """
-    listing = []
-    i = 0
-    for video in video_details['videos']:
-        if video['mirrors']:
-            mirrors = urllib.urlencode(video['mirrors'])
-        else:
-            mirrors = 'none'
-        try:
-            flv = video_details['flvs'][i]
-        except IndexError:
-            flv = 'none'
-        i += 1
-        item = {'label': video['filename'],
-                'thumbnail': video_details['thumb'],
-                'path': plugin.url_for('select_mirror', path=video['path'], mirrors=mirrors, flv=flv),
-                'info': {'title': video['filename'],
-                         'genre': video_details['genre'],
-                         'director': video_details['director'],
-                         'plot': video_details['plot']},
-                'is_playable': True,
-                'context_menu': [(u'Загрузить файл…',
-                u'RunScript({addon_path}/resources/lib/commands.py,download,{filename},{path},{mirrors},{flv})'.format(
-                    addon_path=addon_path, filename=urllib.quote_plus(video['filename'].encode('utf-8')),
-                        path=video['path'], mirrors=mirrors, flv=flv)),
-                                (u'Просмотрено/не просмотрено', 'Action(ToggleWatched)')]
-                }
-        try:
-            item['info']['year'] = int(video_details['year'])
-        except ValueError:
-            pass
-        if video_details['cast']:
-            item['info']['cast'] = video_details['cast'].split(', ')
-        if video_details['rating']:
-            try:
-                item['info']['rating'] = float(video_details['rating'])
-            except ValueError:
-                pass
-        listing.append(item)
-    return listing
-
-# Plugin routes
 
 @plugin.route('/')
 def categories():
@@ -188,7 +82,7 @@ def categories():
         categories = get_categories()
     else:
         categories = exua_parser.get_categories()
-    return plugin.finish(list_categories(categories), view_mode=50)
+    return plugin.finish(views.list_categories(plugin, categories), view_mode=50)
 
 
 @plugin.route('/categories/<path>/<page_No>')
@@ -203,7 +97,7 @@ def video_articles(path, page_No='0'):
         videos = get_videos(path, page, pages)
     else:
         videos = exua_parser.get_videos(path, page=page, pages=pages)
-    listing = list_videos(videos, path, page)
+    listing = views.list_videos(plugin, videos, path, page)
     __log__('video_articles; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
@@ -220,7 +114,7 @@ def display_path(path):
         page_type, contents = exua_parser.check_page(path)
     view_mode = 50
     if page_type == 'video_page':
-        listing = list_video_details(contents)
+        listing = views.list_video_details(plugin, contents)
         if plugin.addon.getSetting('use_skin_info') == 'true':
             # Switch view based on a current skin.
             current_skin = xbmc.getSkinDir()
@@ -231,9 +125,9 @@ def display_path(path):
             elif current_skin == 'skin.aeon.nox.5':
                 view_mode = 55
     elif page_type == 'video_list':
-        listing = list_videos(contents, path=path)
+        listing = views.list_videos(plugin, contents, path=path)
     elif page_type == 'categories':
-        listing = list_categories(contents)
+        listing = views.list_categories(plugin, contents)
     else:
         listing = []
     __log__('display_path; listing', listing)
@@ -304,7 +198,7 @@ def search_category(path=''):
             videos = get_videos(search_path, page=0, pages=get_items_per_page())
         else:
             videos = exua_parser.get_videos(search_path, page=0, pages=get_items_per_page())
-        listing = list_videos(videos, search_path)
+        listing = views.list_videos(plugin, videos, search_path)
         if listing and plugin.addon.getSetting('savesearch') == 'true':
             storage['search_history'].insert(0, {'text': search_text, 'query': search_path})
             if len(storage['search_history']) > get_history_length():
@@ -362,7 +256,7 @@ def bookmarks():
     __log__('bookmarks; is_logged_in', loader.is_logged_in())
     __log__('bookmarks; successful_login', successful_login)
     if loader.is_logged_in() or successful_login:
-        listing += list_videos(exua_parser.get_videos('/buffer', loader))
+        listing += views.list_videos(plugin, exua_parser.get_videos('/buffer', loader))
     __log__('bookmarks; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
