@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
 else:  # If the module is imported during normal plugin run within XBMC.
     import xbmcaddon
-    from webloader import *
+    from webloader import WebLoader, Opener
     from logger import log as __log__
     _addon = xbmcaddon.Addon()
     google_icon = os.path.join(_addon.getAddonInfo('path'), 'resources', 'icons', 'google.png')
@@ -317,8 +317,8 @@ def check_page(path):
 def google_search(url):
     """
     Search ex.ua videos on Google.com
-    :param url:
-    :return:
+    :param url: str
+    :return: dict
     """
     __log__('exua_parser.google_search; url', url)
     videos = []

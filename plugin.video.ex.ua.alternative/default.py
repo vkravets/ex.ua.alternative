@@ -39,7 +39,7 @@ sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
 import webloader
 import login_window
-from constants import *
+from constants import SEARCH_CATEGORIES
 from logger import log as __log__
 # Create web loader instance.
 loader = webloader.WebLoader()
@@ -71,18 +71,7 @@ def get_videos(path, page, pages):
 def check_page(url):
     return exua_parser.check_page(url)
 
-
-@plugin.route('/')
-def categories():
-    """
-    Show home menu - ex.ua video categories.
-    """
-    if plugin.addon.getSetting('cache_pages') == 'true':
-        categories = get_categories()
-    else:
-        categories = exua_parser.get_categories()
-    return plugin.finish(list_categories(categories), view_mode=50)
-
+#Create views
 
 def list_categories(categories):
     """
@@ -116,27 +105,6 @@ def list_categories(categories):
     return listing
 
 
-@plugin.route('/categories/<path>/<page_No>')
-def video_articles(path, page_No='0'):
-    """
-    Show video articles.
-    """
-    __log__('video_articles; path', path)
-    page = int(page_No)
-    pages = get_items_per_page()
-    if plugin.addon.getSetting('cache_pages') == 'true':
-        videos = get_videos(path, page, pages)
-    else:
-        videos = exua_parser.get_videos(path, page=page, pages=pages)
-    listing = list_videos(videos, path, page)
-    # if page_No != '0':
-    # listing.insert(0, {'label': u'<< Главная',
-    #                    'path': plugin.url_for('categories'),
-    #                    'thumbnail': os.path.join(icons, 'home.png')})
-    __log__('video_articles; listing', listing)
-    return plugin.finish(listing, view_mode=50)
-
-
 def list_videos(videos, path='', page=0):
     """
     Create a list of video articles to browse.
@@ -163,38 +131,6 @@ def list_videos(videos, path='', page=0):
                            'path': plugin.url_for('search_category', path=path),
                            'thumbnail': os.path.join(icons, 'search.png')})
     return listing
-
-
-@plugin.route('/videos/<path>')
-def display_path(path):
-    """
-    Display path depending on its contents: video item, video list or categories.
-    """
-    __log__('display_path; path', path)
-    if plugin.addon.getSetting('cache_pages') == 'true':
-        page_type, contents = check_page(path)
-    else:
-        page_type, contents = exua_parser.check_page(path)
-    view_mode = 50
-    if page_type == 'video_page':
-        listing = list_video_details(contents)
-        if plugin.addon.getSetting('use_skin_info') == 'true':
-            # Switch view based on a current skin.
-            current_skin = xbmc.getSkinDir()
-            if current_skin in ('skin.confluence', 'skin.confluence-plood', 'skin.confluence-plood-gotham'):
-                view_mode = 503
-            elif current_skin in ('skin.aeon.nox', 'skin.aeon.nox.gotham'):
-                view_mode = 52
-            elif current_skin == 'skin.aeon.nox.5':
-                view_mode = 55
-    elif page_type == 'video_list':
-        listing = list_videos(contents, path=path)
-    elif page_type == 'categories':
-        listing = list_categories(contents)
-    else:
-        listing = []
-    __log__('display_path; listing', listing)
-    return plugin.finish(listing, view_mode=view_mode)
 
 
 def list_video_details(video_details):
@@ -240,6 +176,72 @@ def list_video_details(video_details):
                 pass
         listing.append(item)
     return listing
+
+# Plugin routes
+
+@plugin.route('/')
+def categories():
+    """
+    Show home menu - ex.ua video categories.
+    """
+    if plugin.addon.getSetting('cache_pages') == 'true':
+        categories = get_categories()
+    else:
+        categories = exua_parser.get_categories()
+    return plugin.finish(list_categories(categories), view_mode=50)
+
+
+@plugin.route('/categories/<path>/<page_No>')
+def video_articles(path, page_No='0'):
+    """
+    Show video articles.
+    """
+    __log__('video_articles; path', path)
+    page = int(page_No)
+    pages = get_items_per_page()
+    if plugin.addon.getSetting('cache_pages') == 'true':
+        videos = get_videos(path, page, pages)
+    else:
+        videos = exua_parser.get_videos(path, page=page, pages=pages)
+    listing = list_videos(videos, path, page)
+    # if page_No != '0':
+    # listing.insert(0, {'label': u'<< Главная',
+    #                    'path': plugin.url_for('categories'),
+    #                    'thumbnail': os.path.join(icons, 'home.png')})
+    __log__('video_articles; listing', listing)
+    return plugin.finish(listing, view_mode=50)
+
+
+@plugin.route('/videos/<path>')
+def display_path(path):
+    """
+    Display path depending on its contents: video item, video list or categories.
+    """
+    __log__('display_path; path', path)
+    if plugin.addon.getSetting('cache_pages') == 'true':
+        page_type, contents = check_page(path)
+    else:
+        page_type, contents = exua_parser.check_page(path)
+    view_mode = 50
+    if page_type == 'video_page':
+        listing = list_video_details(contents)
+        if plugin.addon.getSetting('use_skin_info') == 'true':
+            # Switch view based on a current skin.
+            current_skin = xbmc.getSkinDir()
+            if current_skin in ('skin.confluence', 'skin.confluence-plood', 'skin.confluence-plood-gotham'):
+                view_mode = 503
+            elif current_skin in ('skin.aeon.nox', 'skin.aeon.nox.gotham'):
+                view_mode = 52
+            elif current_skin == 'skin.aeon.nox.5':
+                view_mode = 55
+    elif page_type == 'video_list':
+        listing = list_videos(contents, path=path)
+    elif page_type == 'categories':
+        listing = list_categories(contents)
+    else:
+        listing = []
+    __log__('display_path; listing', listing)
+    return plugin.finish(listing, view_mode=view_mode)
 
 
 @plugin.route('/play/<path>/<mirrors>/<flv>', name='select_mirror')
@@ -333,6 +335,11 @@ def search_history():
 
 @plugin.route('/bookmarks/')
 def bookmarks():
+    """
+    Login to display ex.ua bookmarks
+
+    :return: None
+    """
     successful_login = False
     listing = []
     if not loader.is_logged_in():
