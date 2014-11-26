@@ -23,7 +23,7 @@ def list_categories(plugin, categories):
     """
     listing = []
     for category in categories:
-        item = {'label': '{0} [{1}]'.format(category['name'], category['items#']),
+        item = {'label': u'{0} [{1}]'.format(category['name'], category['items#']),
                 'path': plugin.url_for('video_articles', mode='list', path=category['path'], page_No='0'),
                 'thumbnail': os.path.join(icons, 'video.png')
         }
@@ -53,9 +53,11 @@ def list_videos(plugin, videos, path='', page=0):
     """
     Create a list of video articles to browse.
     """
-    listing = [{'label': u'<< Главная',
-                'path': plugin.url_for('categories'),
-                'thumbnail': os.path.join(icons, 'home.png')}]
+    listing = []
+    if addon.getSetting('show_home') == 'true' or page > 0:
+        listing.append({'label': u'<< Главная',
+                        'path': plugin.url_for('categories'),
+                        'thumbnail': os.path.join(icons, 'home.png')})
     if videos['videos']:
         if videos['prev']:
             listing.append({'label': videos['prev'] + u' < Назад',
