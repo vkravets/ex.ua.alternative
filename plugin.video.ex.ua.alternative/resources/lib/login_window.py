@@ -9,6 +9,7 @@ import pyxbmct.addonwindow as pyxbmct
 
 class LoginWindow(pyxbmct.AddonDialogWindow):
     """ Login window class """
+
     def __init__(self, username='', password='', captcha=''):
         """ Class constructor """
         super(LoginWindow, self).__init__()

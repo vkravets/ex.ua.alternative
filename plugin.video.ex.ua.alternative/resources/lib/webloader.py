@@ -104,6 +104,7 @@ class WebLoader(object):
         with 'captcha_id' and 'captcha_file' keys.
         """
         web_page = self.get_page(LOGIN_URL)
+        captcha = {'captcha_id': '', 'captcha_file': ''}
         captcha_group = re.search('<img src=\'/captcha\?captcha_id=(.+?)\'', web_page, re.UNICODE)
         if captcha_group is not None:
             captcha_id = captcha_group.group(1)
@@ -111,8 +112,6 @@ class WebLoader(object):
             os.remove(captcha_file)
             urllib.urlretrieve('http://www.ex.ua/captcha?captcha_id=' + captcha_id, captcha_file)
             captcha = {'captcha_id': captcha_id, 'captcha_file': captcha_file}
-        else:
-            captcha = {'captcha_id': '', 'captcha_file': ''}
         __log__('WebLoader.check_captcha; captcha', captcha)
         return captcha
 

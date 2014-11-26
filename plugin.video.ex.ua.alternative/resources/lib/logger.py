@@ -8,15 +8,16 @@ import xbmcaddon
 
 _addon = xbmcaddon.Addon()
 
+
 def log(var_name='', variable=None):
     """
     Debug logger.
     """
     if _addon.getSetting('debug') == 'true':
         try:
-            print u'plugin.video.ex.ua.alternative. %s: %s' % (var_name, variable)
+            print u'plugin.video.ex.ua.alternative. {0}: {1}'.format(var_name, variable)
         except UnicodeEncodeError:
-            print u'plugin.video.ex.ua.alternative. %s:' % var_name, variable.encode('utf-8')
+            print u'plugin.video.ex.ua.alternative. {0}: {1}'.format(var_name, variable.encode('utf-8'))
 
 
 if __name__ == '__main__':

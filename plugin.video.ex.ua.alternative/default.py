@@ -16,6 +16,7 @@ import xbmcgui
 from xbmcswift2 import Plugin
 
 
+# Helper functions
 def get_history_length():
     """
     Get history length as an integer.
@@ -33,7 +34,6 @@ def get_items_per_page():
 # Create xbmcswift2 plugin instance.
 plugin = Plugin()
 addon_path = plugin.addon.getAddonInfo('path').decode('utf-8')
-icons = os.path.join(addon_path, 'resources', 'icons')
 # Import custom modules.
 sys.path.append(os.path.join(addon_path, 'resources', 'lib'))
 import exua_parser
@@ -56,7 +56,7 @@ if plugin.addon.getSetting('savesearch') == 'true':
 
 
 # Cache categories page for 3 hours
-@plugin.cached(60 * 3)
+@plugin.cached(180)
 def get_categories():
     return exua_parser.get_categories()
 
@@ -68,7 +68,7 @@ def get_videos(path, page, pages):
 
 
 # Cache checked page for 3 hours.
-@plugin.cached(60 * 3)
+@plugin.cached(180)
 def check_page(url):
     return exua_parser.check_page(url)
 
@@ -144,7 +144,7 @@ def play_video(path, mirrors='', flv=''):
         if plugin.addon.getSetting('choose_mirrors') == '1':
             if mirrors != 'none':
                 mirrors_list = urlparse.parse_qsl(mirrors)
-                menu_items = [u'Зеркало ' + item[0] for item in mirrors_list]
+                menu_items = [u'Зеркало {0}'.format(item[0]) for item in mirrors_list]
                 urls = [item[1] for item in mirrors_list]
             else:
                 urls = []
@@ -222,7 +222,7 @@ def search_history():
             icon = 'search.png'
         listing.append({'label': item['text'],
                         'path': plugin.url_for('video_articles', path=item['query'], page_No='0'),
-                        'thumbnail': os.path.join(icons, icon)})
+                        'thumbnail': os.path.join(addon_path, 'resources', 'icons', icon)})
     __log__('search_history; listing', listing)
     return plugin.finish(listing, view_mode=50)
 

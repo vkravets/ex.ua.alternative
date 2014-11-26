@@ -23,7 +23,7 @@ def list_categories(plugin, categories):
     """
     listing = []
     for category in categories:
-        item = {'label': category['name'] + ' [' + category['items#'] + ']',
+        item = {'label': '{0} [{1}]'.format(category['name'], category['items#']),
                 'path': plugin.url_for('video_articles', mode='list', path=category['path'], page_No='0'),
                 'thumbnail': os.path.join(icons, 'video.png')
         }

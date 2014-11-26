@@ -25,10 +25,10 @@ if __name__ == '__main__':
             Return a loaded page or an empty string in case of a network error.
             """
             request = urllib2.Request(url, None,
-                                  {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
-                                  'Host': SITE[7:],
-                                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                                  'Accept-Charset': 'UTF-8'})
+                              {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0',
+                              'Host': SITE[7:],
+                              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                              'Accept-Charset': 'UTF-8'})
             try:
                 session = urllib2.urlopen(request)
             except urllib2.URLError:
