@@ -24,4 +24,9 @@ provider-name="Roman_V_M">
   <description lang="uk">Надбудова для прегляду відео з EX.UA.</description>
   <platform>all</platform>
 </extension>
+<extension point="xbmc.addon.repository" name="ex.ua.alternative repository">
+  <info compressed="true">https://dl.dropboxusercontent.com/u/24356082/repo/addons.xml</info>
+  <checksum>https://dl.dropboxusercontent.com/u/24356082/repo/addons.xml.md5</checksum>
+  <datadir zip="true">https://dl.dropboxusercontent.com/u/24356082/repo</datadir>
+</extension>
 </addon>
