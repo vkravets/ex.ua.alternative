@@ -17,7 +17,7 @@ def log(var_name='', variable=None):
         try:
             print u'plugin.video.ex.ua.alternative. {0}: {1}'.format(var_name, variable)
         except UnicodeEncodeError:
-            print u'plugin.video.ex.ua.alternative. {0}: {1}'.format(var_name, variable.encode('utf-8'))
+            print 'plugin.video.ex.ua.alternative. {0}: {1}'.format(var_name, variable.encode('utf-8'))
 
 
 if __name__ == '__main__':
