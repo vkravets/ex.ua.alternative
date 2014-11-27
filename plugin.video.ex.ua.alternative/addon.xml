@@ -25,8 +25,8 @@ provider-name="Roman_V_M">
   <platform>all</platform>
 </extension>
 <extension point="xbmc.addon.repository" name="ex.ua.alternative repository">
-  <info compressed="true">https://dl.dropboxusercontent.com/u/24356082/repo/addons.xml</info>
-  <checksum>https://dl.dropboxusercontent.com/u/24356082/repo/addons.xml.md5</checksum>
-  <datadir zip="true">https://dl.dropboxusercontent.com/u/24356082/repo</datadir>
+  <info compressed="true">https://dl.dropboxusercontent.com/u/24356082/kodi_repo/addons.xml</info>
+  <checksum>https://dl.dropboxusercontent.com/u/24356082/kodi_repo/addons.xml.md5</checksum>
+  <datadir zip="true">https://dl.dropboxusercontent.com/u/24356082/kodi_repo</datadir>
 </extension>
 </addon>
