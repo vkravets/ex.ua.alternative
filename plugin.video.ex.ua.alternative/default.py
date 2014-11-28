@@ -189,8 +189,12 @@ def search_category(path=''):
     search_text = keyboard.getText()
     if search_text and keyboard.isConfirmed():
         if path:
-            search_path = '/search?s={query}&original_id={id_}'.format(
-                                    query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
+            if plugin.addon.getSetting('altsearch') == 'true':
+                search_path = 'http://www.expoisk.com/index.php?r={id_}&s={query}'.format(
+                    id_=SEARCH_CATEGORIES[path], query=urllib.quote_plus(search_text))
+            else:
+                search_path = '/search?s={query}&original_id={id_}'.format(
+                    query=urllib.quote_plus(search_text), id_=SEARCH_CATEGORIES[path])
         else:
             search_path = 'http://www.google.com.ua/search?q=site%3Aex.ua+{0}'.format(urllib.quote_plus(search_text))
         __log__('search_category; search_path', search_path)

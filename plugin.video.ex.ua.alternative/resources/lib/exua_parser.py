@@ -46,7 +46,7 @@ else:  # If the module is imported during normal plugin run within XBMC.
     from webloader import WebLoader, Opener
     from logger import log as __log__
     _addon = xbmcaddon.Addon()
-    google_icon = os.path.join(_addon.getAddonInfo('path'), 'resources', 'icons', 'google.png')
+    icons = os.path.join(_addon.getAddonInfo('path'), 'resources', 'icons')
     if _addon.getSetting('hq_posters') == 'true':
         IMG_QUALITY = '400'
     else:
@@ -96,7 +96,19 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         prev: numbers of previous pages, if any.
         next: numbers of next pages, if any.
     """
-    if 'www.google.com.ua' not in path:
+    if 'www.google.com.ua' in path:
+        start = ''
+        if page > 0:
+            start = '&start={0}'.format(10 * page)
+        url = path + start
+        results = google_search(url)
+    elif 'www.expoisk.com' in path:
+        p = ''
+        if page > 0:
+            p = '&p={0}'.format(page + 1)
+        url = path + p
+        results = expoisk(url)
+    else:
         if page > 0:
             if '?r=' in path or '?s=' in path:
                 p = '&p='
@@ -111,14 +123,8 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
             page_count = ''
         url = SITE + path + pageNo + page_count
         web_page = page_loader.get_page(url)
-        results = parse_videos(web_page)
         __log__('exua_parser.get_videos; web_page', web_page)
-    else:
-        start = ''
-        if page > 0:
-            start = '&start={0}'.format(10 * page)
-        url = path + start
-        results = google_search(url)
+        results = parse_videos(web_page)
     __log__('exua_parser.get_videos; url', url)
     return results
 
@@ -313,17 +319,12 @@ def google_search(url):
     __log__('exua_parser.google_search; url', url)
     videos = []
     opener = Opener(host='www.google.com.ua', language='uk-ua')
-    try:
-        session = opener.open(url)
-    except urllib2.URLError:
-        page = ''
-    else:
-        page = session.read().decode('utf-8')
-        session.close()
+    page = opener.get_page(url)
+    __log__('exua_parser.google_search; results_page', page)
     soup = BeautifulSoup(page)
     results = soup.find_all('a', {'href': re.compile('^' + SITE)})
     for result in results:
-        videos.append({'thumb': google_icon,
+        videos.append({'thumb': os.path.join(icons, 'google.png'),
                        'path': result['href'].replace(SITE, ''),
                        'title': result.get_text()})
     prev = next_ = ''
@@ -333,8 +334,38 @@ def google_search(url):
     next_tag = soup.find('span', text=u'Уперед')
     if next_tag is not None:
         next_ = '>'
-    return {'videos': videos, 'prev': prev, 'next': next_}
+    result = {'videos': videos, 'prev': prev, 'next': next_}
+    __log__('exua_parser.google_search; result', result)
+    return result
 
+
+def expoisk(url):
+    """
+    Search ex.ua videos on expoisk.com
+    :param url: str
+    :return: dict
+    """
+    __log__('exua_areser.expoisk; url', url)
+    videos = []
+    opener = Opener(host='www.expoisk.com')
+    page = opener.get_page(url)
+    __log__('exua_areser.expoisk; results_page', page)
+    soup = BeautifulSoup(page)
+    results = soup.find_all('a', {'href': re.compile(r'^http://www.ex.ua/'), 'title': True})
+    for result in results:
+        videos.append({'thumb': os.path.join(icons, 'search.png'),
+                       'path': result['href'].replace(SITE, ''),
+                       'title': result['title']})
+    prev = next_ = ''
+    prev_tag = soup.find('a', {'title': u'Перейти на предыдущую страницу'})
+    if prev_tag is not None:
+        prev = prev_tag.find_previous_sibling('a').text
+    next_tag = soup.find('a', {'title': u'Перейти на следующую страницу'})
+    if next_tag is not None:
+        next_ = next_tag.find_next('a').text
+    result = {'videos': videos, 'prev': prev, 'next': next_}
+    __log__('exua_parser.exepoisk; result', result)
+    return result
 
 if __name__ == '__main__':
     pass

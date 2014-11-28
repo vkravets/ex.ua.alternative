@@ -5,6 +5,8 @@
         label="Выбор файла для воспроизведения" default="0"/>
     <setting id="hq_posters" type="bool"
         label="Постеры высокого качества" default="false"/>
+    <setting id="altsearch" type="bool"
+        label="Использовать альтернативный поиск (www.expoisk.com)" default="true"/>
     <setting id="savesearch" type="bool"
         label="Сохранять историю поиска" default="true"/>
     <setting id="historylength" type="enum" values="5|10|15|20|25"
