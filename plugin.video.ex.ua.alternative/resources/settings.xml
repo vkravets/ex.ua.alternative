@@ -18,7 +18,7 @@
     <setting id="itemcount" type="enum" values="25|50|75|100"
         label="Количество элементов на странице" default = "0"/>
     <setting id="show_home" type="bool"
-        label="Показывать ссылку &quot;<< Главная&quot; на 1-й странице" default="false"/>
+        label="Показывать ссылку &quot;<< Главная&quot; на 1-й странице раздела" default="false"/>
     <setting id="cache_pages" type="bool"
         label="Кэшировать страницы" default="true"/>
     <setting type="action"
