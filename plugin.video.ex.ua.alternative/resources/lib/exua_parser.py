@@ -252,7 +252,11 @@ def parse_video_details(web_page):
                 if detail_text is None or len(text) <= 3:
                     while True:
                         next_ = search_detail.find_next(text=True)
-                        text_group = re.search(VIDEO_DETAILS[detail][2], next_, re.UNICODE)
+                        try:
+                            text_group = re.search(VIDEO_DETAILS[detail][2], next_, re.UNICODE)
+                        except TypeError:
+                            text = ''
+                            break
                         if text_group is not None:
                             text = text_group.group(0)
                         else:
