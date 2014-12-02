@@ -24,8 +24,7 @@ SEARCH_CATEGORIES = {'/ru/video/foreign?r=23775': '2',
                      '/ru/video/commercial?r=23775': '371152',
                      '/ru/video/mobile?r=23775': '607160',
                      '/ru/video/artist?r=23775': '7513588',
-                     '/73427589?r=23775': '73427589',
-                     '/78103603?r=23775': '78103603'}
+                     '/73427589?r=23775': '73427589'}
 # Extensions for supported media files
 MEDIA_EXTENSIONS = ('avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|' +
                     'AVI|MKV|TS|M2TS|MP4|M4V|FLV|VOB|MPG|MPEG|ISO|MOV|WMV|RAR|ZIP|' +
@@ -41,5 +40,5 @@ VIDEO_DETAILS = {'year': (u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]
                     'cast': (u'[ВвУу] ролях.*', u'[ВвУу] ролях.*?: *?(.*)', '(.*)'),
                     'rating': (u'IMD[Bb].*', u'IMD[Bb].*?: *?(\d\.\d)', '(\d\.\d)')}
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

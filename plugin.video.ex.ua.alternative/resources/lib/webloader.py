@@ -43,23 +43,8 @@ class Opener(object):
         self.opener.addheaders = self.headers
 
     def open(self, url, data=None):
-        """
-        Open URL and return a session object
-        """
+        """Open specified url and return a HTTP session object"""
         return self.opener.open(url, data)
-
-    def get_page(self, url, data=None):
-        """
-        Load a web-page with a given url.
-        """
-        try:
-            session = self.open(url, data)
-        except urllib2.URLError:
-            web_page = ''
-        else:
-            web_page = session.read().decode('utf-8')
-            session.close()
-        return web_page
 
 
 class WebLoader(object):
@@ -78,12 +63,18 @@ class WebLoader(object):
 
     def get_page(self, url, data=None):
         """
-        Load a web-page with a given url using cookies.
+        Load a web-page with a given url.
         """
         self.cookie_jar.load()
         __log__('WebLoader.get_page; cookies', self.get_cookies())
-        web_page = self.opener.get_page(url, data)
-        self.cookie_jar.save()
+        try:
+            session = self.opener.open(url, data)
+        except urllib2.URLError:
+            web_page = ''
+        else:
+            self.cookie_jar.save()
+            web_page = session.read().decode('utf-8')
+            session.close()
         return web_page
 
     def is_logged_in(self):
