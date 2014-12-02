@@ -61,15 +61,15 @@ def list_videos(plugin, videos, path='', page=0):
     listing = []
     if path in SEARCH_CATEGORIES.keys() and page == 0:
             listing.append({'label': u'[Поиск в разделе…]',
-                           'path': plugin.url_for('search_category', path=path),
-                           'thumbnail': os.path.join(icons, 'search.png')})
+                            'path': plugin.url_for('search_category', path=path),
+                            'thumbnail': os.path.join(icons, 'search.png')})
     if addon.getSetting('show_home') == 'true' or page > 0:
         listing.append({'label': u'<< Главная',
                         'path': plugin.url_for('categories'),
                         'thumbnail': os.path.join(icons, 'home.png')})
     if videos['videos']:
         if videos['prev']:
-            listing.append({'label': videos['prev'] + u' < Назад',
+            listing.append({'label': u'{0} < Назад'.format(videos['prev']),
                             'path': plugin.url_for('video_articles', path=path, page_No=str(page - 1)),
                             'thumbnail': os.path.join(icons, 'previous.png')})
         for video in videos['videos']:
@@ -78,7 +78,7 @@ def list_videos(plugin, videos, path='', page=0):
                     'path': plugin.url_for('display_path', path=video['path'])}
             listing.append(item)
         if videos['next']:
-            listing.append({'label': u'Вперед > ' + videos['next'],
+            listing.append({'label': u'Вперед > {0}'.format(videos['next']),
                             'path': plugin.url_for('video_articles', path=path, page_No=str(page + 1)),
                             'thumbnail': os.path.join(icons, 'next.png')})
     return listing
@@ -86,7 +86,7 @@ def list_videos(plugin, videos, path='', page=0):
 
 def list_video_details(plugin, video_details):
     """
-    Show video details.
+    Create a list of media files with details.
     """
     listing = []
     i = 0
@@ -126,4 +126,24 @@ def list_video_details(plugin, video_details):
             except ValueError:
                 pass
         listing.append(item)
+    return listing
+
+
+def list_search_history(plugin):
+    """
+    Create a list of search history.
+    """
+    listing = []
+    if addon.getSetting('show_home') == 'true':
+        listing.append({'label': u'<< Главная',
+                        'path': plugin.url_for('categories'),
+                        'thumbnail': os.path.join(icons, 'home.png')})
+    for item in plugin.get_storage('storage').get('search_history'):
+        if 'google.com.ua' in item['query']:
+            icon = 'google.png'
+        else:
+            icon = 'search.png'
+        listing.append({'label': item['text'],
+                        'path': plugin.url_for('video_articles', path=item['query'], page_No='0'),
+                        'thumbnail': os.path.join(icons, icon)})
     return listing

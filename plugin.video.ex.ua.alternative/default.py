@@ -216,15 +216,7 @@ def search_history():
     """
     Show search history.
     """
-    listing = []
-    for item in storage.get('search_history'):
-        if 'google.com.ua' in item['query']:
-            icon = 'google.png'
-        else:
-            icon = 'search.png'
-        listing.append({'label': item['text'],
-                        'path': plugin.url_for('video_articles', path=item['query'], page_No='0'),
-                        'thumbnail': os.path.join(addon_path, 'resources', 'icons', icon)})
+    listing = views.list_search_history(plugin)
     __log__('search_history; listing', listing)
     return plugin.finish(listing, view_mode=50)
 
