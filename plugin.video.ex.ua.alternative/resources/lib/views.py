@@ -25,8 +25,7 @@ def list_categories(plugin, categories):
     for category in categories:
         item = {'label': u'{0} [{1}]'.format(category['name'], category['items#']),
                 'path': plugin.url_for('video_articles', mode='list', path=category['path'], page_No='0'),
-                'thumbnail': os.path.join(icons, 'video.png')
-        }
+                'thumbnail': os.path.join(icons, 'video.png')}
         listing.append(item)
     if addon.getSetting('usegoogle') == 'false':
         search_label = u'[Поиск…]'
@@ -60,6 +59,10 @@ def list_videos(plugin, videos, path='', page=0):
     Create a list of video articles to browse.
     """
     listing = []
+    if path in SEARCH_CATEGORIES.keys() and page == 0:
+            listing.append({'label': u'[Поиск в разделе…]',
+                           'path': plugin.url_for('search_category', path=path),
+                           'thumbnail': os.path.join(icons, 'search.png')})
     if addon.getSetting('show_home') == 'true' or page > 0:
         listing.append({'label': u'<< Главная',
                         'path': plugin.url_for('categories'),
@@ -78,10 +81,6 @@ def list_videos(plugin, videos, path='', page=0):
             listing.append({'label': u'Вперед > ' + videos['next'],
                             'path': plugin.url_for('video_articles', path=path, page_No=str(page + 1)),
                             'thumbnail': os.path.join(icons, 'next.png')})
-        if path in SEARCH_CATEGORIES.keys() and page == 0:
-            listing.insert(0, {'label': u'[Поиск в разделе…]',
-                           'path': plugin.url_for('search_category', path=path),
-                           'thumbnail': os.path.join(icons, 'search.png')})
     return listing
 
 
