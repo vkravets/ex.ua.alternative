@@ -27,7 +27,7 @@ def list_categories(plugin, categories):
                 'path': plugin.url_for('video_articles', mode='list', path=category['path'], page_No='0'),
                 'thumbnail': os.path.join(icons, 'video.png')}
         listing.append(item)
-    if addon.getSetting('usegoogle') == 'false':
+    if addon.getSetting('use_google') == 'false':
         search_label = u'[Поиск…]'
         search_icon = os.path.join(icons, 'search.png')
     else:

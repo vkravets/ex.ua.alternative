@@ -5,7 +5,7 @@
         label="Выбор файла для воспроизведения" default="0"/>
     <setting id="hq_posters" type="bool"
         label="Постеры высокого качества" default="false"/>
-    <setting id="usegoogle" type="bool"
+    <setting id="use_google" type="bool"
         label="Использовать глобальный поиск Google" default="false"/>
     <setting id="savesearch" type="bool"
         label="Сохранять историю поиска" default="true"/>

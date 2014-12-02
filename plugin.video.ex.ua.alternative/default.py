@@ -191,7 +191,7 @@ def search_category(path=''):
         if path:
             search_path = '/search?s={0}&original_id={1}'.format(urllib.quote_plus(search_text), SEARCH_CATEGORIES[path])
         else:
-            if plugin.addon.getSetting('usegoogle') == 'false':
+            if plugin.addon.getSetting('use_google') == 'false':
                 search_path = '/search?s={0}'.format(urllib.quote_plus(search_text))
             else:
                 search_path = 'http://www.google.com.ua/search?q=site%3Aex.ua+{0}'.format(urllib.quote_plus(search_text))
