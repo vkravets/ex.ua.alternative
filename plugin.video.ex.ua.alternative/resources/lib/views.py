@@ -28,9 +28,15 @@ def list_categories(plugin, categories):
                 'thumbnail': os.path.join(icons, 'video.png')
         }
         listing.append(item)
-    listing.append({'label': u'[Поиск Google]',
-                    'path': plugin.url_for('google'),
-                    'thumbnail': os.path.join(icons, 'google.png')})
+    if addon.getSetting('usegoogle') == 'false':
+        search_label = u'[Поиск…]'
+        search_icon = os.path.join(icons, 'search.png')
+    else:
+        search_label = u'[Поиск Google…]'
+        search_icon = os.path.join(icons, 'google.png')
+    listing.append({'label': search_label,
+                    'path': plugin.url_for('global_search'),
+                    'thumbnail': search_icon})
     if plugin.addon.getSetting('savesearch') == 'true':
         listing.append({'label': u'[История поиска]',
                         'path': plugin.url_for('search_history'),
@@ -73,7 +79,7 @@ def list_videos(plugin, videos, path='', page=0):
                             'path': plugin.url_for('video_articles', path=path, page_No=str(page + 1)),
                             'thumbnail': os.path.join(icons, 'next.png')})
         if path in SEARCH_CATEGORIES.keys() and page == 0:
-            listing.insert(0, {'label': u'[Поиск…]',
+            listing.insert(0, {'label': u'[Поиск в разделе…]',
                            'path': plugin.url_for('search_category', path=path),
                            'thumbnail': os.path.join(icons, 'search.png')})
     return listing

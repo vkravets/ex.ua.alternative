@@ -96,7 +96,13 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         prev: numbers of previous pages, if any.
         next: numbers of next pages, if any.
     """
-    if 'www.google.com.ua' not in path:
+    if 'www.google.com.ua' in path:
+        start = ''
+        if page > 0:
+            start = '&start={0}'.format(10 * page)
+        url = path + start
+        results = google_search(url)
+    else:
         if page > 0:
             if '?r=' in path or '?s=' in path:
                 p = '&p='
@@ -113,12 +119,6 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
         web_page = page_loader.get_page(url)
         results = parse_videos(web_page)
         __log__('exua_parser.get_videos; web_page', web_page)
-    else:
-        start = ''
-        if page > 0:
-            start = '&start={0}'.format(10 * page)
-        url = path + start
-        results = google_search(url)
     __log__('exua_parser.get_videos; url', url)
     return results
 
@@ -313,14 +313,7 @@ def google_search(url):
     __log__('exua_parser.google_search; url', url)
     videos = []
     opener = Opener(host='www.google.com.ua', language='uk-ua')
-    try:
-        session = opener.open(url)
-    except urllib2.URLError:
-        page = ''
-    else:
-        page = session.read().decode('utf-8')
-        session.close()
-    soup = BeautifulSoup(page)
+    soup = BeautifulSoup(opener.get_page(url))
     results = soup.find_all('a', {'href': re.compile('^' + SITE)})
     for result in results:
         videos.append({'thumb': google_icon,
