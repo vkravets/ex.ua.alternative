@@ -11,7 +11,6 @@ import urlparse
 import os
 # Import XBMC modules
 import xbmc
-import xbmcplugin
 import xbmcgui
 from xbmcswift2 import Plugin
 
@@ -243,5 +242,4 @@ def bookmarks():
 
 
 if __name__ == '__main__':
-    xbmcplugin.setContent(int(sys.argv[1]), 'movies')
     plugin.run()
