@@ -16,21 +16,6 @@ import xbmcgui
 from xbmcswift2 import Plugin
 
 
-# Helper functions
-def get_history_length():
-    """
-    Get history length as an integer.
-    """
-    return {'0': 5, '1': 10, '2': 15, '3': 20, '4': 25}[plugin.addon.getSetting('historylength')]
-
-
-def get_items_per_page():
-    """
-    Get items per page as a string.
-    """
-    return {'0': '25', '1': '50', '2': '75', '3': '100'}[plugin.addon.getSetting('itemcount')]
-
-
 # Create xbmcswift2 plugin instance.
 plugin = Plugin()
 addon_path = plugin.addon.getAddonInfo('path').decode('utf-8')
@@ -50,9 +35,11 @@ if plugin.addon.getSetting('savesearch') == 'true':
     # Create search_history storage if not exists.
     if storage.get('search_history') is None:
         storage['search_history'] = []
-    elif storage.get('search_history') is not None and len(storage.get('search_history')) > get_history_length():
+    elif storage.get('search_history') is not None and len(storage.get('search_history')) >\
+            int(plugin.addon.getSetting('historylength')):
         # Remove extra elements if search history has been decreased.
-        storage['search_history'][-(len(storage.get('search_history')) - get_history_length()):] = []
+        storage['search_history'][-(len(storage.get('search_history')) -
+                                    int(plugin.addon.getSetting('historylength'))):] = []
 
 
 # Cache categories page for 3 hours
@@ -92,7 +79,7 @@ def video_articles(path, page_No='0'):
     """
     __log__('video_articles; path', path)
     page = int(page_No)
-    pages = get_items_per_page()
+    pages = plugin.addon.getSetting('itemcount')
     if plugin.addon.getSetting('cache_pages') == 'true':
         videos = get_videos(path, page, pages)
     else:
@@ -197,13 +184,13 @@ def search_category(path=''):
                 search_path = 'http://www.google.com.ua/search?q=site%3Aex.ua+{0}'.format(urllib.quote_plus(search_text))
         __log__('search_category; search_path', search_path)
         if plugin.addon.getSetting('cache_pages') == 'true':
-            videos = get_videos(search_path, page=0, pages=get_items_per_page())
+            videos = get_videos(search_path, page=0, pages=plugin.addon.getSetting('itemcount'))
         else:
-            videos = exua_parser.get_videos(search_path, page=0, pages=get_items_per_page())
+            videos = exua_parser.get_videos(search_path, page=0, pages=plugin.addon.getSetting('itemcount'))
         listing = views.list_videos(plugin, videos, search_path)
         if listing and plugin.addon.getSetting('savesearch') == 'true':
             storage['search_history'].insert(0, {'text': search_text, 'query': search_path})
-            if len(storage['search_history']) > get_history_length():
+            if len(storage['search_history']) > int(plugin.addon.getSetting('historylength')):
                 storage['search_history'].pop(-1)
         elif not listing:
             xbmcgui.Dialog().ok(u'Ничего не найдено!', u'Уточните поисковый запрос и повторите попытку.')

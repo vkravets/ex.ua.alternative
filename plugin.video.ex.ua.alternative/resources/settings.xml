@@ -9,16 +9,16 @@
         label="Использовать глобальный поиск Google" default="false"/>
     <setting id="savesearch" type="bool"
         label="Сохранять историю поиска" default="true"/>
-    <setting id="historylength" type="enum" values="5|10|15|20|25"
-        label="Длина истории поиска" enable="eq(-1,true)" default = "1"/>
+    <setting id="historylength" type="labelenum" values="5|10|15|20|25"
+        label="Длина истории поиска" enable="eq(-1,true)" default = "10"/>
     <setting type="action"
     label="Очистить историю поиска" action="RunScript($CWD/resources/lib/commands.py,history)" />
   </category>
   <category label="Навигация">
     <setting id="use_skin_info" type="bool"
         label="Показывать информацию о файлах в обложке" default="true"/>
-    <setting id="itemcount" type="enum" values="25|50|75|100"
-        label="Количество элементов на странице" default = "0"/>
+    <setting id="itemcount" type="labelenum" values="25|50|75|100"
+        label="Количество элементов на странице" default = "25"/>
     <setting id="show_home" type="bool"
         label="Показывать ссылку &quot;<< Главная&quot; на 1-й странице раздела" default="false"/>
     <setting id="cache_pages" type="bool"
