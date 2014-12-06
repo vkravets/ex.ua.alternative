@@ -7,6 +7,7 @@
 import os
 import urllib
 import urllib2
+import socket
 import cookielib
 import re
 import hashlib
@@ -49,7 +50,7 @@ class Opener(object):
     def get_page(self, url, data=None):
         try:
             session = self.opener.open(url, data)
-        except urllib2.URLError:
+        except urllib2.URLError, socket.timeout:
             web_page = ''
         else:
             web_page = session.read().decode('utf-8')
@@ -143,7 +144,7 @@ class WebLoader(object):
         """Get direct link to a video file"""
         try:
             sesion = self.opener.open(url)
-        except urllib2.URLError:
+        except urllib2.URLError, socket.timeout:
             resolved_url = ''
         else:
             resolved_url = sesion.geturl()
