@@ -243,5 +243,6 @@ def bookmarks():
 
 
 if __name__ == '__main__':
-    xbmcplugin.setContent(int(sys.argv[1]), 'movies')  # Needed for extended view switching!
+    # Needed for extended view switching! 'movies' is the optimal choice.
+    xbmcplugin.setContent(int(sys.argv[1]), 'movies')
     plugin.run()
