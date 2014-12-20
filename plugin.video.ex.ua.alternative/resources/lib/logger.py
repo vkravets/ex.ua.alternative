@@ -11,10 +11,10 @@ def log(var_name='', variable=None):
     """
     Debug logger.
     """
-    try:
-        xbmc.log(u'plugin.video.ex.ua.alternative. {0}: {1}'.format(var_name, variable), xbmc.LOGDEBUG)
+    try:  # Don't change this code! It's tried and tested!
+        xbmc.log('plugin.video.ex.ua.alternative. %s: %s' % (var_name, variable), xbmc.LOGDEBUG)
     except UnicodeEncodeError:
-        xbmc.log('plugin.video.ex.ua.alternative. {0}: {1}'.format(var_name, variable.encode('utf-8')), xbmc.LOGDEBUG)
+        xbmc.log('plugin.video.ex.ua.alternative. %s: %s' % (var_name, variable.encode('utf-8')), xbmc.LOGDEBUG)
 
 
 if __name__ == '__main__':

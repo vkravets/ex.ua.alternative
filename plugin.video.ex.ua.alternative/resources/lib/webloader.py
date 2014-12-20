@@ -53,7 +53,7 @@ class Opener(object):
         except urllib2.URLError, socket.timeout:
             web_page = ''
         else:
-            web_page = session.read().decode('utf-8')
+            web_page = session.read().decode('utf-8', errors='replace')
             session.close()
         return web_page
 
