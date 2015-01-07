@@ -107,7 +107,7 @@ def display_path(path):
             current_skin = xbmc.getSkinDir()
             if current_skin in ('skin.confluence', 'skin.confluence-plood', 'skin.confluence-plood-gotham'):
                 view_mode = 503
-            elif current_skin in ('skin.aeon.nox', 'skin.aeon.nox.gotham'):
+            elif current_skin in ('skin.aeon.nox', 'skin.aeon.nox.gotham', 'skin.aeon.shednox.helix'):
                 view_mode = 52
             elif current_skin == 'skin.aeon.nox.5':
                 view_mode = 55
