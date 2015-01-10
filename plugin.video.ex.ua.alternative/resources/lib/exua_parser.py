@@ -277,8 +277,11 @@ def parse_video_details(web_page):
                     if next_tag.name == 'span':
                         break
                     else:
-                        text += next_tag.get_text('\n', strip=True)
-                        prev_tag = next_tag
+                        try:
+                            text += next_tag.get_text('\n', strip=True)
+                            prev_tag = next_tag
+                        except AttributeError:
+                            break
                 details['plot'] = text.replace(u'смотреть онлайн', '')
     __log__('exua_parser.get_videos; parse_video_details', details)
     return details
@@ -334,4 +337,4 @@ def google_search(url):
 
 
 if __name__ == '__main__':
-    pass
+    print parse_video_details(loader.get_page('http://www.ex.ua/80628362?r=2'))
