@@ -50,7 +50,8 @@ class Opener(object):
     def get_page(self, url, data=None):
         try:
             session = self.opener.open(url, data)
-        except urllib2.URLError, socket.timeout:
+        except (urllib2.URLError, socket.timeout) as ex:
+            __log__('webloader.Opener.get_page. Connection error', ex)
             web_page = ''
         else:
             web_page = session.read().decode('utf-8', 'replace')
@@ -144,7 +145,8 @@ class WebLoader(object):
         """Get direct link to a video file"""
         try:
             sesion = self.opener.open(url)
-        except urllib2.URLError, socket.timeout:
+        except (urllib2.URLError, socket.timeout) as ex:
+            __log__('webloader.WebLoader.get_girect_link. Connection error', ex)
             resolved_url = ''
         else:
             resolved_url = sesion.geturl()

@@ -117,8 +117,8 @@ def get_videos(path, page_loader=loader, page=0, pages='25'):
             page_count = ''
         url = SITE + path + pageNo + page_count
         web_page = page_loader.get_page(url)
-        results = parse_videos(web_page)
         __log__('exua_parser.get_videos; web_page', web_page)
+        results = parse_videos(web_page)
     __log__('exua_parser.get_videos; url', url)
     return results
 
