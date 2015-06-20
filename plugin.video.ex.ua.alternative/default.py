@@ -86,7 +86,8 @@ def video_articles(path, page_No='0'):
         videos = exua_parser.get_videos(path, page=page, pages=pages)
     listing = views.list_videos(plugin, videos, path, page)
     __log__('video_articles; listing', listing)
-    return plugin.finish(listing, view_mode=50)
+    update_listing = int(page_No) > 0
+    return plugin.finish(listing, view_mode=50, update_listing=update_listing)
 
 
 @plugin.route('/videos/<path>')
