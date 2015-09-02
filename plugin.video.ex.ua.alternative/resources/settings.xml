@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
   <category label="Общие">
-    <setting id="choose_mirrors" type="enum" values="По умолчанию|Диалог выбора|Облегченное видео (FLV)"
+    <setting id="choose_mirrors" type="enum" values="По умолчанию|Диалог выбора|Облегченное видео (MP4)"
         label="Выбор файла для воспроизведения" default="0"/>
     <setting id="hq_posters" type="bool"
         label="Постеры высокого качества" default="false"/>
