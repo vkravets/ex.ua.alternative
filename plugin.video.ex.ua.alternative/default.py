@@ -69,7 +69,7 @@ def categories():
         categories = get_categories()
     else:
         categories = exua_parser.get_categories()
-    return plugin.finish(views.list_categories(plugin, categories), view_mode=50)
+    return views.list_categories(plugin, categories)
 
 
 @plugin.route('/categories/<path>/<page_No>')
@@ -87,7 +87,7 @@ def video_articles(path, page_No='0'):
     listing = views.list_videos(plugin, videos, path, page)
     __log__('video_articles; listing', listing)
     update_listing = int(page_No) > 0
-    return plugin.finish(listing, view_mode=50, update_listing=update_listing)
+    return plugin.finish(listing, update_listing=update_listing)
 
 
 @plugin.route('/videos/<path>')
@@ -100,7 +100,7 @@ def display_path(path):
         page_type, contents = check_page(path)
     else:
         page_type, contents = exua_parser.check_page(path)
-    view_mode = 50
+    view_mode = None
     if page_type == 'video_page':
         listing = views.list_video_details(plugin, contents)
         if plugin.addon.getSetting('use_skin_info') == 'true':
@@ -196,7 +196,7 @@ def search_category(path=''):
         elif not listing:
             xbmcgui.Dialog().ok(u'Ничего не найдено!', u'Уточните поисковый запрос и повторите попытку.')
     __log__('search_category; listing', listing)
-    return plugin.finish(listing, view_mode=50)
+    return listing
 
 
 @plugin.route('/search_history/')
@@ -206,7 +206,7 @@ def search_history():
     """
     listing = views.list_search_history(plugin)
     __log__('search_history; listing', listing)
-    return plugin.finish(listing, view_mode=50)
+    return listing
 
 
 @plugin.route('/bookmarks/')
@@ -240,7 +240,7 @@ def bookmarks():
     if loader.is_logged_in() or successful_login:
         listing += views.list_videos(plugin, exua_parser.get_videos('/buffer', loader))
     __log__('bookmarks; listing', listing)
-    return plugin.finish(listing, view_mode=50)
+    return listing
 
 
 if __name__ == '__main__':
