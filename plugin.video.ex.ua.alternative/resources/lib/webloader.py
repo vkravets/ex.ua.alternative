@@ -89,11 +89,8 @@ class WebLoader(object):
         """
         for cookie in self.cookie_jar:
             if cookie.name == 'ukey' and len(cookie.value) > 1:
-                logged_in = True
-                break
-        else:
-            logged_in = False
-        return logged_in
+                return True
+        return False
 
     def get_cookies(self):
         """
