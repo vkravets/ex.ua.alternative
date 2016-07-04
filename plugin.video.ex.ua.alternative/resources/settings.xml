@@ -1,41 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
-  <category label="Общие">
-    <setting id="choose_mirrors" type="enum" values="По умолчанию|Диалог выбора|Облегченное видео (MP4)"
-        label="Выбор файла для воспроизведения" default="0"/>
-    <setting id="hq_posters" type="bool"
-        label="Постеры высокого качества" default="false"/>
-    <setting id="use_google" type="bool"
-        label="Использовать глобальный поиск Google" default="false"/>
-    <setting id="savesearch" type="bool"
-        label="Сохранять историю поиска" default="true"/>
-    <setting id="historylength" type="labelenum" values="5|10|15|20|25"
-        label="Длина истории поиска" enable="eq(-1,true)" default = "10"/>
-    <setting type="action"
-        label="Очистить историю поиска" action="RunScript($CWD/resources/lib/commands.py,history)" />
-  </category>
-  <category label="Навигация">
-    <setting id="use_skin_info" type="bool"
-        label="Показывать информацию о файлах в обложке" default="true"/>
-    <setting id="itemcount" type="labelenum" values="25|50|75|100"
-        label="Количество элементов на странице" default = "25"/>
-    <setting id="show_home" type="bool"
-        label="Показывать ссылку &quot;<< Главная&quot; на 1-й странице раздела" default="false"/>
-    <setting id="cache_pages" type="bool"
-        label="Кэшировать страницы" default="true"/>
-    <setting type="action"
-        label="Очистить кэш страниц" action="RunScript($CWD/resources/lib/commands.py,cache)" />
-  </category>
-  <category label="Авторизация">
-    <setting id="authorization" type="bool"
-        label="Использовать учетные данные ex.ua" default="false"/>
-    <setting id="save_pass" type="bool"
-        label="Сохранять пароль (не рекомендуется)" enable="eq(-1,true)" default="false"/>
-    <setting type="action"
-        label="Удалить cookies (сброс авторизации)" action="RunScript($CWD/resources/lib/commands.py,cookies)" />
-  </category>
-  <category label="Дополнительно">
-  <setting id="direct_link" type="bool"
-        label="Получать прямую ссылку на видеофайл" default="false"/>
+  <category label="32000">
   </category>
 </settings>
