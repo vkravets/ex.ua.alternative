@@ -62,7 +62,7 @@ def parse_videos(web_page):
     """
     Parse a video list page to get the list of videos and navigation links
     """
-    soup = BeautifulSoup(web_page, parser='html5lib')
+    soup = BeautifulSoup(web_page, 'html5lib')
     nav_table = soup.find('table', border='0', cellpadding='5', cellspacing='0')
     if nav_table is not None:
         prev_tag = nav_table.find('img', src='/t3/arr_l.gif')

@@ -60,6 +60,8 @@ def video_list(params):
             'url': plugin.get_url(action='video_list', path=params['path'], page=str(page + 1)),
             'thumb': os.path.join(icons, 'previous.png')
         })
+    plugin.log(str(listing))
+    return listing
 
 
 def display_path(params):

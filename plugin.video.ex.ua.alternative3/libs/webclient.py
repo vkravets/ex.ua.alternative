@@ -32,4 +32,6 @@ def load_page(url, post_data=None):
         resp = session.get(url)
     with open(cookies_file, 'wb') as fo:
         pickle.dump(session.cookies, fo)
-    return resp.text
+    page = resp.text
+    plugin.log(page.encode('utf-8'))
+    return page
