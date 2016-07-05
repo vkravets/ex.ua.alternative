@@ -10,3 +10,27 @@ msgstr ""
 msgctxt "#32000"
 msgid "General"
 msgstr ""
+
+msgctxt "#32001"
+msgid "ex.ua language"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Items per page"
+msgstr ""
+
+msgctxt "#32003"
+msgid "High quality posters"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Home"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Previous"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Next"
+msgstr ""

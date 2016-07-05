@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
   <category label="32000">
+    <setting id="site_lang" type="labelenum" values="ru|uk|en"
+      label="32001" default="ru" />
+    <setting id="itemcount" type="labelenum" values="25|50|75|100"
+      label="32002" default = "25"/>
+    <setting id="hq_posters" type="bool"
+      label="32003" default="false"/>
   </category>
 </settings>
