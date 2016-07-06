@@ -13,7 +13,7 @@ SITE = 'http://www.ex.ua'
 
 VideoCategory = namedtuple('VideoCategory', ['name', 'path', 'items'])
 VideoList = namedtuple('VideoList', ['videos', 'prev', 'next'])
-VideoItem = namedtuple('VideoItem', ['thumb', 'path', 'title'])
+VideoItem = namedtuple('VideoItem', ['title', 'thumb', 'path'])
 
 plugin = Plugin()
 if plugin.hq_posters:
@@ -93,7 +93,6 @@ def parse_video_list(content_table):
     for content_cell in content_cells:
         try:
             link_tag = content_cell.find('a')
-            path = link_tag['href']
             image_tag = content_cell.find('img')
             if image_tag is not None:
                 thumb = image_tag['src'][:-3] + poster_quality
@@ -104,4 +103,4 @@ def parse_video_list(content_table):
         except TypeError:
             continue
         else:
-            yield VideoItem(thumb, path, title)
+            yield VideoItem(title, thumb, link_tag['href'])
