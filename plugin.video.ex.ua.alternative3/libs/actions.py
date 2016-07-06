@@ -59,7 +59,7 @@ def video_list(params):
         listing.append({
             'label': u'{0} > {1}'.format(_('Next'), videos.next),
             'url': plugin.get_url(action='video_list', path=params['path'], page=str(page + 1)),
-            'thumb': os.path.join(icons, 'previous.png')
+            'thumb': os.path.join(icons, 'next.png')
         })
     plugin.log(str(listing))
     return plugin.create_listing(listing, update_listing=pagination)
