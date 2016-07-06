@@ -25,7 +25,10 @@ def load_page(url, post_data=None):
     session.headers = HEADERS.copy()
     if os.path.exists(cookies_file):
         with open(cookies_file, 'rb') as fo:
-            session.cookies = pickle.load(fo)
+            try:
+                session.cookies = pickle.load(fo)
+            except (pickle.PickleError, EOFError):
+                pass
     if post_data is not None:
         resp = session.post(url, data=post_data)
     else:
