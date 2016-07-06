@@ -3,6 +3,7 @@
 # E-mail: romanvm@yandex.ua
 # Licence: GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
+import ast
 import re
 from collections import namedtuple
 from bs4 import BeautifulSoup
@@ -11,9 +12,24 @@ import webclient
 
 SITE = 'http://www.ex.ua'
 
+# Extensions for supported media files
+MEDIA_EXTENSIONS = 'avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|' \
+                   'mp3|aac|ogg|wav|dts|ac3|flac'
+# Regexps for parsing info about videos
+VIDEO_DETAILS = {
+    'year': u'(?:[Гг]од|[Рр]ік).*?\s?:\s*?(\d{4})',
+    'genre': u'[Жж]анр.*?\s?:\s+?(\w.*)\n',
+    'director': u'[Рр]ежисс?[её]р.*?\s?:\s*?(\w.*)\n',
+    'duration': u'(?:[Пп]родолжительность|[Тт]ривалість).*?\s?:\s*?(\w.*)\n',
+    'plot': u'(?:Опис|О фильме|Сюжет|О чем|О сериале).*?\s?:\s*?(\w.*)\n',
+    'cast': u'(?:[ВвУу] ролях|[Аа]кт[ео]р[ыи]).*?\s?:\s*?(\w.*)\n',
+    'rating': u'IMD[Bb].*?\s?:\s*?(\d\.\d)',
+    }
+
 VideoCategory = namedtuple('VideoCategory', ['name', 'path', 'items'])
 VideoList = namedtuple('VideoList', ['videos', 'prev', 'next'])
 VideoItem = namedtuple('VideoItem', ['title', 'thumb', 'path'])
+VideoDetails = namedtuple('VideoDetails', ['title', 'thumb', 'media', 'mp4', 'info'])
 
 plugin = Plugin()
 if plugin.hq_posters:
@@ -34,8 +50,10 @@ def parse_categories(html):
     Parse video categories list
     """
     parse = re.findall('<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>', html, re.UNICODE)
+    listing = []
     for item in parse:
-        yield VideoCategory(item[0], item[1], item[2])
+        listing.append(VideoCategory(item[0], item[1], item[2]))
+    return listing
 
 
 def get_video_list(path, page=0, pages=25):
@@ -90,6 +108,7 @@ def parse_video_list(content_table):
     Parse the list of videos
     """
     content_cells = content_table.find_all('td')
+    listing = []
     for content_cell in content_cells:
         try:
             link_tag = content_cell.find('a')
@@ -101,6 +120,69 @@ def parse_video_list(content_table):
                 else:
                     thumb = ''
                     title = link_tag.text
-                yield VideoItem(title, thumb, link_tag['href'])
+                listing.append(VideoItem(title, thumb, link_tag['href']))
         except TypeError:
             pass
+    return listing
+
+
+def get_video_details(path):
+    """
+    Get video details.
+    """
+    web_page = webclient.load_page(SITE + path)
+    return parse_video_details(web_page)
+
+
+def _is_descr_table(tag):
+    return (
+        tag.name == 'table' and
+        tag.has_attr('width') and
+        tag.has_attr('cellpadding') and
+        tag.has_attr('cellspacing') and
+        tag.has_attr('border') and
+        not tag.has_attr('height')
+    )
+
+
+def parse_video_details(web_page):
+    """
+    Parse a video item page to extract as much details as possible
+    """
+    soup = BeautifulSoup(web_page, 'html5lib')
+    title = soup.find('h1').text
+    thumb_tag = soup.find('link', rel='image_src')
+    if thumb_tag is not None:
+        thumb = thumb_tag['href'][:-3] + poster_quality
+    else:
+        thumb = ''
+    media_tags = soup.find_all('a', title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.I))
+    media = []
+    for media_tag in media_tags:
+        mirror_tags = media_tag.find_next('td', class_='small').find_all('a', rel='nofollow', title=True)
+        mirrors = []
+        if mirror_tags:
+            for mirror_tag in mirror_tags:
+                mirrors.append((mirror_tag.text, mirror_tag['href']))
+        media.append({'filename': media_tag.text, 'path': media_tag['href'], 'mirrors': mirrors})
+    mp4_regex = re.compile('player_list = \'(.*)\';')
+    var_player_list = soup.find('script', text=mp4_regex)
+    if var_player_list is not None:
+        mp4 = []
+        for mp4_item in ast.literal_eval('[' + re.search(mp4_regex, var_player_list.text).group(1) + ']'):
+            mp4.append(mp4_item['url'])
+    else:
+        mp4 = None
+    descr_table_tag = soup.find(_is_descr_table)
+    if descr_table_tag is not None:
+        text = descr_table_tag.get_text('\n', strip=True)
+        info = {}
+        for detail, regex in VIDEO_DETAILS.iteritems():
+            match = re.search(regex, text, re.U | re.M)
+            if match is not None:
+                info[detail] = match.group(1)
+        if not info.get('plot'):
+            info['plot'] = text
+    else:
+        info = None
+    return VideoDetails(title, thumb, media, mp4, info)

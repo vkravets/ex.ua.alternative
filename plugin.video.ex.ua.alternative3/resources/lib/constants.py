@@ -27,9 +27,7 @@ SEARCH_CATEGORIES = {'/ru/video/foreign?r=23775': '2',
                      '/73427589?r=23775': '73427589'}
 # Extensions for supported media files
 MEDIA_EXTENSIONS = ('avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|' +
-                    'AVI|MKV|TS|M2TS|MP4|M4V|FLV|VOB|MPG|MPEG|ISO|MOV|WMV|RAR|ZIP|' +
-                    'mp3|aac|ogg|wav|dts|ac3|flac|' +
-                    'MP3|AAC|OGG|WAV|DTS|AC3|FLAC')
+                    'mp3|aac|ogg|wav|dts|ac3|flac')
 # Regexps for parsing info about videos
 VIDEO_DETAILS = {'year': (u'(?:[Гг]од|[Рр]ік).*', u'(?:[Гг]од|[Рр]ік).*?: *?(\d{4})', '(\d{4})'),
                     'genre': (u'[Жж]анр.*', u'[Жж]анр.*?: *?(.*)', '.*'),
