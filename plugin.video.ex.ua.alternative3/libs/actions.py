@@ -34,15 +34,12 @@ def video_list(params):
     params: action, path, page
     """
     videos = exua.get_video_list(params['path'], params['page'], plugin.itemcount)
-    listing = []
+    listing = [{
+        'label': u'<< {0}'.format(_('Home')),
+        'url': plugin.get_url(action='root'),
+        'thumb': os.path.join(icons, 'home.png')
+    }]
     page = int(params['page'])
-    pagination = page > 0
-    if pagination:
-        listing.append({
-            'label': u'<< {0}'.format(_('Home')),
-            'url': plugin.get_url(action='root'),
-            'thumb': os.path.join(icons, 'home.png')
-        })
     if videos.prev is not None:
         listing.append({
             'label': u'{0} < {1}'.format(videos.prev, _('Previous')),
@@ -62,7 +59,7 @@ def video_list(params):
             'thumb': os.path.join(icons, 'next.png')
         })
     plugin.log(str(listing))
-    return plugin.create_listing(listing, update_listing=pagination)
+    return plugin.create_listing(listing, update_listing=page > 0)
 
 
 def display_path(params):
