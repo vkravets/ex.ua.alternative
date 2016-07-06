@@ -67,12 +67,12 @@ def parse_videos(web_page):
     if nav_table is not None:
         prev_tag = nav_table.find('img', src='/t3/arr_l.gif')
         if prev_tag is not None:
-            prev_page = prev_tag.find_previous('a', text=re.compile(u'\.\.')).text
+            prev_page = prev_tag.find_previous('a', text=re.compile('\.\.')).text
         else:
             prev_page = None
         next_tag = nav_table.find('img', src='/t3/arr_r.gif')
         if next_tag is not None:
-            next_page = next_tag.find_next('a', text=re.compile(u'\.\.')).text
+            next_page = next_tag.find_next('a', text=re.compile('\.\.')).text
         else:
             next_page = None
     else:
