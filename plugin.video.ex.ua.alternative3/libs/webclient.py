@@ -12,6 +12,7 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0',
     'Accept-Charset': 'UTF-8',
     'Accept': 'text/html',
+    'Referer': 'http://www.ex.ua/'
     }
 plugin = Plugin()
 cookies_file = os.path.join(plugin.config_dir, 'cookies.pcl')
