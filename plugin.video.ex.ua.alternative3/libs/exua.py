@@ -93,14 +93,14 @@ def parse_video_list(content_table):
     for content_cell in content_cells:
         try:
             link_tag = content_cell.find('a')
-            image_tag = content_cell.find('img')
-            if image_tag is not None:
-                thumb = image_tag['src'][:-3] + poster_quality
-                title = image_tag['alt']
-            else:
-                thumb = ''
-                title = link_tag.text
+            if link_tag is not None:
+                image_tag = content_cell.find('img')
+                if image_tag is not None:
+                    thumb = image_tag['src'][:-3] + poster_quality
+                    title = image_tag['alt']
+                else:
+                    thumb = ''
+                    title = link_tag.text
+                yield VideoItem(title, thumb, link_tag['href'])
         except TypeError:
-            continue
-        else:
-            yield VideoItem(title, thumb, link_tag['href'])
+            pass
