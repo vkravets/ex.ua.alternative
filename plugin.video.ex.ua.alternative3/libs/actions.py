@@ -8,7 +8,7 @@ from simpleplugin import Plugin
 import exua
 
 plugin = Plugin()
-icons = os.path.join(plugin.path, 'resoruces', 'icons')
+icons = os.path.join(plugin.path, 'resources', 'icons')
 _ = plugin.initialize_gettext()
 
 
@@ -36,7 +36,8 @@ def video_list(params):
     videos = exua.get_video_list(params['path'], params['page'], plugin.itemcount)
     listing = []
     page = int(params['page'])
-    if page > 0:
+    pagination = page > 0
+    if pagination:
         listing.append({
             'label': u'<< {0}'.format(_('Home')),
             'url': plugin.get_url(action='root'),
@@ -61,7 +62,7 @@ def video_list(params):
             'thumb': os.path.join(icons, 'previous.png')
         })
     plugin.log(str(listing))
-    return listing
+    return plugin.create_listing(listing, update_listing=pagination)
 
 
 def display_path(params):
