@@ -21,6 +21,7 @@ def _root():
         content = 'video'
     else:
         content = 'audio'
+    plugin.log('Container.FolderPath: {0}'.format(xbmc.getInfoLabel('Container.FolderPath')))
     categories = exua.get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
     plugin.log(str(categories))
     for category in categories:
@@ -29,6 +30,11 @@ def _root():
             'url': plugin.get_url(action='media_list', path=category.path, page='0'),
             'thumb': os.path.join(icons, content + '.png')
         }
+    yield {
+        'label': u'[{0}]'.format(_('Search')),
+        'url': plugin.get_url(action='search'),
+        'thumb': os.path.join(icons, 'search.png')
+    }
 
 
 def root(params):
@@ -49,6 +55,12 @@ def _media_list(path, page):
         'url': plugin.get_url(),
         'thumb': os.path.join(icons, 'home.png')
     }
+    if media.original_id is not None:
+        yield {
+            'label': u'[{0}]'.format(_('Search in the category')),
+            'url': plugin.get_url(action='search', original_id=media.original_id),
+            'thumb': os.path.join(icons, 'search.png')
+        }
     if media.prev is not None:
         yield {
             'label': u'{0} < {1}'.format(media.prev, _('Previous')),
@@ -83,6 +95,10 @@ def display_path(params):
     return []
 
 
+def search(params):
+    return []
+
 plugin.actions['root'] = root
 plugin.actions['media_list'] = media_list
 plugin.actions['display_path'] = display_path
+plugin.actions['search'] = search

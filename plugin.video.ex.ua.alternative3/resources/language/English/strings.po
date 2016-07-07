@@ -34,3 +34,11 @@ msgstr ""
 msgctxt "#32006"
 msgid "Next"
 msgstr ""
+
+msgctxt "#32007"
+msgid "Search"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Search in the category"
+msgstr ""

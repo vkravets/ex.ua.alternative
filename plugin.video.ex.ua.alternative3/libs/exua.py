@@ -27,7 +27,7 @@ VIDEO_DETAILS = {
     }
 
 MediaCategory = namedtuple('MediaCategory', ['name', 'path', 'items'])
-MediaList = namedtuple('MediaList', ['media', 'prev', 'next'])
+MediaList = namedtuple('MediaList', ['media', 'prev', 'next', 'original_id'])
 MediaItem = namedtuple('MediaItem', ['title', 'thumb', 'path'])
 MediaDetails = namedtuple('MediaDetails', ['title', 'thumb', 'media', 'mp4', 'info'])
 
@@ -100,7 +100,12 @@ def parse_media_list(web_page):
         media = parse_media_items(content_table)
     else:
         media = []
-    return MediaList(media, prev_page, next_page)
+    original_id_tag = soup.find('input', type='hidden', original_id=True)
+    if original_id_tag is not None:
+        original_id = original_id_tag['value']
+    else:
+        original_id = None
+    return MediaList(media, prev_page, next_page, original_id)
 
 
 def parse_media_items(content_table):
