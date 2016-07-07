@@ -17,13 +17,13 @@ MEDIA_EXTENSIONS = 'avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip
                    'mp3|aac|ogg|wav|dts|ac3|flac'
 # Regexps for parsing info about videos
 VIDEO_DETAILS = {
-    'year': u'(?:[Гг]од|[Рр]ік).*?\s?:\s*?(\d{4})',
-    'genre': u'[Жж]анр.*?\s?:\s+?(\w.*)\n',
-    'director': u'[Рр]ежисс?[её]р.*?\s?:\s*?(\w.*)\n',
-    #'duration': u'(?:[Пп]родолжительность|[Тт]ривалість).*?\s?:\s*?(\w.*)\n',
-    'plot': u'(?:Опис|О фильме|Сюжет|О чем|О сериале).*?\s?:\s*?(\w.*)\n',
-    'cast': u'(?:[ВвУу] ролях|[Аа]кт[ео]р[ыи]).*?\s?:\s*?(\w.*)\n',
-    'rating': u'IMD[Bb].*?\s?:\s*?(\d\.\d)',
+    'year': ur'(?:[Гг]од|[Рр]ік).*?\s?:\s*?(\d{4})',
+    'genre': ur'[Жж]анр.*?\s?:\s+?(\w.*)',
+    'director': ur'[Рр]ежисс?[её]р.*?\s?:\s*?(\w.*)\n',
+    #'duration': ur'(?:[Пп]родолжительность|[Тт]ривалість).*?\s?:\s*?(\w.*)\n',
+    'plot': ur'(?:Опис|О фильме|Сюжет|О чем|О сериале).*?\s?:\s*?(\w.*)\n',
+    'cast': ur'(?:[ВвУу] ролях|[Аа]кт[ео]р[ыи]).*?\s?:\s*?(\w.*)\n',
+    'rating': ur'IMD[Bb].*?\s?:\s*?(\d\.\d)',
     }
 
 MediaCategory = namedtuple('MediaCategory', ['name', 'path', 'items'])
@@ -185,8 +185,10 @@ def parse_media_details(web_page):
         text = descr_table_tag.get_text('\n', strip=True)
         info = {}
         for detail, regex in VIDEO_DETAILS.iteritems():
-            match = re.search(regex, text, re.U | re.M)
+            match = re.search(regex, text, re.UNICODE | re.MULTILINE)
+            plugin.log('Match: {0}'.format(match))
             if match is not None:
+                plugin.log(u'Detail: {0}; match: {1}'.format(detail, match.group(1)).encode('utf-8'))
                 info[detail] = match.group(1)
         if not info.get('plot'):
             info['plot'] = text
@@ -206,7 +208,7 @@ def detect_page_type(path):
         page_type = 'media_page'
         content = parse_media_details(web_page)
     elif ('<table width=100% border=0 cellpadding=0 cellspacing=8' in web_page and
-          '<form name=search action=\'/search\'>' in web_page):
+              ('<form name=search action=\'/search\'>' in web_page or '<span class=modify_time>' in web_page)):
         page_type = 'media_list'
         content = parse_media_list(web_page)
     elif '<table width=100% border=0 cellpadding=0 cellspacing=8 class=include_0>' in web_page:

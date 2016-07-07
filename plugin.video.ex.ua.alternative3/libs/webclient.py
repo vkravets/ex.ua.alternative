@@ -22,6 +22,7 @@ def load_page(url, post_data=None):
     """
     Load a webpage from ex.ua by given url
     """
+    plugin.log('Loading page {0} with post_data {1}'.format(url, post_data))
     session = requests.Session()
     session.headers = HEADERS.copy()
     if os.path.exists(cookies_file):
@@ -37,5 +38,5 @@ def load_page(url, post_data=None):
     with open(cookies_file, 'wb') as fo:
         pickle.dump(session.cookies, fo)
     page = resp.text
-    plugin.log(page.encode('utf-8'))
+    plugin.log('Page loaded:\n{0}'.format(page.encode('utf-8')))
     return page

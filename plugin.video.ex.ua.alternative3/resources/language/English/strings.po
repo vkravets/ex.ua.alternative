@@ -46,3 +46,15 @@ msgstr ""
 msgctxt "#32009"
 msgid "Mark as watched/unwatched"
 msgstr ""
+
+msgctxt "#32010"
+msgid "Search query"
+msgstr ""
+
+msgctxt "#32011"
+msgid "No results found"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Refine your search and try again"
+msgstr ""
