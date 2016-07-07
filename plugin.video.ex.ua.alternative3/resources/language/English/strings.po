@@ -36,11 +36,11 @@ msgid "Next"
 msgstr ""
 
 msgctxt "#32007"
-msgid "Search"
+msgid "Search..."
 msgstr ""
 
 msgctxt "#32008"
-msgid "Search in the category"
+msgid "Search in the category..."
 msgstr ""
 
 msgctxt "#32009"
@@ -65,4 +65,16 @@ msgstr ""
 
 msgctxt "#32014"
 msgid "Cache pages"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Save search history"
+msgstr ""
+
+msgctxt "#32016"
+msgid "Search history length"
+msgstr ""
+
+msgctxt "#32017"
+msgid "Search history"
 msgstr ""

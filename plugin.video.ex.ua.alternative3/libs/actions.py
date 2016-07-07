@@ -5,6 +5,7 @@
 
 import os
 import urllib
+from collections import namedtuple
 import xbmc
 import xbmcgui
 from simpleplugin import Plugin
@@ -13,6 +14,7 @@ import exua
 plugin = Plugin()
 icons = os.path.join(plugin.path, 'resources', 'icons')
 _ = plugin.initialize_gettext()
+SearchQuery = namedtuple('SearchQuery', ['query', 'path'])
 
 
 def _get_plugin_content_type(path):
@@ -32,10 +34,16 @@ def _media_categories(categories, content):
             'thumb': os.path.join(icons, content + '.png')
         }
     yield {
-        'label': u'[{0}]'.format(_('Search')),
+        'label': u'[{0}]'.format(_('Search...')),
         'url': plugin.get_url(action='search'),
         'thumb': os.path.join(icons, 'search.png')
     }
+    if plugin.savesearch:
+        yield {
+            'label': u'[{0}]'.format(_('Search history')),
+            'url': plugin.get_url(action='search_history'),
+            'thumb': os.path.join(icons, 'search.png')
+        }
 
 
 @plugin.cached(180)
@@ -68,7 +76,7 @@ def _media_list(path, media_listing, page=0):
         }
     if media_listing.original_id is not None:
         yield {
-            'label': u'[{0}]'.format(_('Search in the category')),
+            'label': u'[{0}]'.format(_('Search in the category...')),
             'url': plugin.get_url(action='search', original_id=media_listing.original_id),
             'thumb': os.path.join(icons, 'search.png')
         }
@@ -201,9 +209,32 @@ def search(params):
         plugin.log('Search results:' + str(results))
         if results.media:
             listing = _media_list(search_path, results)
+            if plugin.savesearch:
+                with plugin.get_storage() as storage:
+                    history = storage.get('history', [])
+                    history.insert(0, SearchQuery(search_text, search_path))
+                    if len(history) > plugin.historylength:
+                        history.pop(-1)
+                    storage['history'] = history
         else:
             xbmcgui.Dialog().ok(_('No results found'), _('Refine your search and try again'))
     return plugin.create_listing(listing)
+
+
+def search_history(params):
+    listing = []
+    with plugin.get_storage() as storage:
+        history = storage.get('history', [])
+        if len(history) > plugin.historylength:
+            history[plugin.historylength - len(history):] = []
+            storage['history'] = history
+        for item in history:
+            listing.append({
+                'label': item.query,
+                'url': plugin.get_url(action='media_list', path=item.path, page='0'),
+                'thumb': os.path.join(icons, 'search.png')
+            })
+    return listing
 
 
 def play(params):
@@ -215,3 +246,4 @@ plugin.actions['media_list'] = media_list
 plugin.actions['display_path'] = display_path
 plugin.actions['search'] = search
 plugin.actions['play'] = play
+plugin.actions['search_history'] = search_history
