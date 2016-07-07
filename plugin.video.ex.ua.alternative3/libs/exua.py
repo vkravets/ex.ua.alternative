@@ -31,7 +31,7 @@ MediaList = namedtuple('MediaList', ['media', 'prev', 'next', 'original_id'])
 MediaItem = namedtuple('MediaItem', ['title', 'thumb', 'path'])
 MediaDetails = namedtuple('MediaDetails', ['title', 'thumb', 'media', 'mp4', 'info'])
 MediaFile = namedtuple('MediaFile', ['filename', 'path', 'mirrors'])
-MediaFileMirror = namedtuple('MediaFileMirror', ['title', 'path'])
+ExUaPage = namedtuple('ExUaPage', ['type', 'content'])
 
 plugin = Plugin()
 if plugin.hq_posters:
@@ -47,11 +47,11 @@ def get_categories(path):
     return parse_categories(webclient.load_page(SITE + path))
 
 
-def parse_categories(html):
+def parse_categories(web_page):
     """
     Parse media categories list
     """
-    parse = re.findall('<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>', html, re.UNICODE)
+    parse = re.findall('<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>', web_page, re.UNICODE)
     listing = []
     for item in parse:
         listing.append(MediaCategory(item[0], item[1], item[2]))
@@ -170,7 +170,7 @@ def parse_media_details(web_page):
         mirrors = []
         if mirror_tags:
             for mirror_tag in mirror_tags:
-                mirrors.append(MediaFileMirror(mirror_tag.text, mirror_tag['href']))
+                mirrors.append(mirror_tag['href'])
         media.append(MediaFile(media_tag.text, media_tag['href'], mirrors))
     mp4_regex = re.compile('player_list = \'(.*)\';')
     var_player_list = soup.find('script', text=mp4_regex)
@@ -193,3 +193,25 @@ def parse_media_details(web_page):
     else:
         info = None
     return MediaDetails(title, thumb, media, mp4, info)
+
+
+def detect_page_type(path):
+    """
+    Detect the type of an ex.ua page
+    """
+    page_type = 'unknown'
+    content = None
+    web_page = webclient.load_page(SITE + path)
+    if '<table width=100% cellpadding=0 cellspacing=0 border=0><tr><td valign=top>' in web_page:
+        page_type = 'media_page'
+        content = parse_media_details(web_page)
+    elif ('<table width=100% border=0 cellpadding=0 cellspacing=8' in web_page and
+          '<form name=search action=\'/search\'>' in web_page):
+        page_type = 'media_list'
+        content = parse_media_list(web_page)
+    elif '<table width=100% border=0 cellpadding=0 cellspacing=8 class=include_0>' in web_page:
+        page_type = 'media_categories'
+        content = parse_categories(web_page)
+    result = ExUaPage(page_type, content)
+    plugin.log(str(result))
+    return result

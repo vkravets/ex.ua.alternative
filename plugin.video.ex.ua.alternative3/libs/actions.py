@@ -3,6 +3,7 @@
 # E-mail: romanvm@yandex.ua
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
+import re
 import os
 import xbmc
 from simpleplugin import Plugin
@@ -13,17 +14,17 @@ icons = os.path.join(plugin.path, 'resources', 'icons')
 _ = plugin.initialize_gettext()
 
 
-def _root():
+def _get_plugin_content_type(path):
+    type_match = re.search(r'(video|audio)', path)
+    if type_match is not None:
+        return type_match.group(1)
+    return 'video'
+
+
+def _media_categories(categories, content):
     """
     Create plugin root listing
     """
-    if 'video' in xbmc.getInfoLabel('Container.FolderPath'):
-        content = 'video'
-    else:
-        content = 'audio'
-    plugin.log('Container.FolderPath: {0}'.format(xbmc.getInfoLabel('Container.FolderPath')))
-    categories = exua.get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
-    plugin.log(str(categories))
     for category in categories:
         yield {
             'label': u'{0} [{1}]'.format(category.name, category.items),
@@ -41,15 +42,16 @@ def root(params):
     """
     Plugin root action
     """
-    return plugin.create_listing(_root())
+    content = _get_plugin_content_type(xbmc.getInfoLabel('Container.FolderPath'))
+    categories = exua.get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
+    plugin.log(str(categories))
+    return plugin.create_listing(_media_categories(categories, content))
 
 
-def _media_list(path, page):
+def _media_list(path, page, media):
     """
     Create the list of videos
     """
-    media = exua.get_media_list(path, page, plugin.itemcount)
-    plugin.log(str(media))
     yield {
         'label': u'<< {0}'.format(_('Home')),
         'url': plugin.get_url(),
@@ -85,18 +87,42 @@ def media_list(params):
     """
     Display the list of videos
 
-    params: action, path, page
+    params: path, page
     """
     page = int(params['page'])
-    return plugin.create_listing(_media_list(params['path'], page), update_listing=page > 0)
+    media = exua.get_media_list(params['path'], page, plugin.itemcount)
+    plugin.log(str(media))
+    return plugin.create_listing(_media_list(params['path'], page, media), update_listing=page > 0)
+
+
+def _media_info(media):
+    """
+    Show the page with media information
+    """
+    return []
 
 
 def display_path(params):
-    return []
+    """
+    Display a ex.ua page depending on its type
+
+    params: path
+    """
+    result = exua.detect_page_type(params['path'])
+    if result.type == 'media_page':
+        listing = _media_info(result.content)
+    elif result.type == 'media_list':
+        listing = _media_list(params['path'], 0, result.content)
+    elif result.type == 'media_categories':
+        listing = _media_categories(result.content, _get_plugin_content_type(params['path']))
+    else:
+        listing = []
+    return plugin.create_listing(listing)
 
 
 def search(params):
     return []
+
 
 plugin.actions['root'] = root
 plugin.actions['media_list'] = media_list
