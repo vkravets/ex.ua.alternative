@@ -30,6 +30,8 @@ MediaCategory = namedtuple('MediaCategory', ['name', 'path', 'items'])
 MediaList = namedtuple('MediaList', ['media', 'prev', 'next', 'original_id'])
 MediaItem = namedtuple('MediaItem', ['title', 'thumb', 'path'])
 MediaDetails = namedtuple('MediaDetails', ['title', 'thumb', 'media', 'mp4', 'info'])
+MediaFile = namedtuple('MediaFile', ['filename', 'path', 'mirrors'])
+MediaFileMirror = namedtuple('MediaFileMirror', ['title', 'path'])
 
 plugin = Plugin()
 if plugin.hq_posters:
@@ -168,8 +170,8 @@ def parse_media_details(web_page):
         mirrors = []
         if mirror_tags:
             for mirror_tag in mirror_tags:
-                mirrors.append((mirror_tag.text, mirror_tag['href']))
-        media.append({'filename': media_tag.text, 'path': media_tag['href'], 'mirrors': mirrors})
+                mirrors.append(MediaFileMirror(mirror_tag.text, mirror_tag['href']))
+        media.append(MediaFile(media_tag.text, media_tag['href'], mirrors))
     mp4_regex = re.compile('player_list = \'(.*)\';')
     var_player_list = soup.find('script', text=mp4_regex)
     if var_player_list is not None:
