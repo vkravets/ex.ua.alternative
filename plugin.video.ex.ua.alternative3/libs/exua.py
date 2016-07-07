@@ -20,7 +20,7 @@ VIDEO_DETAILS = {
     'year': u'(?:[Гг]од|[Рр]ік).*?\s?:\s*?(\d{4})',
     'genre': u'[Жж]анр.*?\s?:\s+?(\w.*)\n',
     'director': u'[Рр]ежисс?[её]р.*?\s?:\s*?(\w.*)\n',
-    'duration': u'(?:[Пп]родолжительность|[Тт]ривалість).*?\s?:\s*?(\w.*)\n',
+    #'duration': u'(?:[Пп]родолжительность|[Тт]ривалість).*?\s?:\s*?(\w.*)\n',
     'plot': u'(?:Опис|О фильме|Сюжет|О чем|О сериале).*?\s?:\s*?(\w.*)\n',
     'cast': u'(?:[ВвУу] ролях|[Аа]кт[ео]р[ыи]).*?\s?:\s*?(\w.*)\n',
     'rating': u'IMD[Bb].*?\s?:\s*?(\d\.\d)',
@@ -29,7 +29,7 @@ VIDEO_DETAILS = {
 MediaCategory = namedtuple('MediaCategory', ['name', 'path', 'items'])
 MediaList = namedtuple('MediaList', ['media', 'prev', 'next', 'original_id'])
 MediaItem = namedtuple('MediaItem', ['title', 'thumb', 'path'])
-MediaDetails = namedtuple('MediaDetails', ['title', 'thumb', 'media', 'mp4', 'info'])
+MediaDetails = namedtuple('MediaDetails', ['title', 'thumb', 'files', 'mp4', 'info'])
 MediaFile = namedtuple('MediaFile', ['filename', 'path', 'mirrors'])
 ExUaPage = namedtuple('ExUaPage', ['type', 'content'])
 
@@ -164,14 +164,14 @@ def parse_media_details(web_page):
     else:
         thumb = ''
     media_tags = soup.find_all('a', title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE))
-    media = []
+    files = []
     for media_tag in media_tags:
         mirror_tags = media_tag.find_next('td', class_='small').find_all('a', rel='nofollow', title=True)
         mirrors = []
         if mirror_tags:
             for mirror_tag in mirror_tags:
                 mirrors.append(mirror_tag['href'])
-        media.append(MediaFile(media_tag.text, media_tag['href'], mirrors))
+        files.append(MediaFile(media_tag.text, media_tag['href'], mirrors))
     mp4_regex = re.compile('player_list = \'(.*)\';')
     var_player_list = soup.find('script', text=mp4_regex)
     if var_player_list is not None:
@@ -192,17 +192,17 @@ def parse_media_details(web_page):
             info['plot'] = text
     else:
         info = None
-    return MediaDetails(title, thumb, media, mp4, info)
+    return MediaDetails(title, thumb, files, mp4, info)
 
 
 def detect_page_type(path):
     """
     Detect the type of an ex.ua page
     """
-    page_type = 'unknown'
+    page_type = None
     content = None
     web_page = webclient.load_page(SITE + path)
-    if '<table width=100% cellpadding=0 cellspacing=0 border=0><tr><td valign=top>' in web_page:
+    if '<table width=100% class=list border=0 cellpadding=0 cellspacing=0 style=\'padding-top: 8px\'>' in web_page:
         page_type = 'media_page'
         content = parse_media_details(web_page)
     elif ('<table width=100% border=0 cellpadding=0 cellspacing=8' in web_page and

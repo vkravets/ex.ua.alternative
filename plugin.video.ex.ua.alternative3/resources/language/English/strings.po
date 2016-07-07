@@ -42,3 +42,7 @@ msgstr ""
 msgctxt "#32008"
 msgid "Search in the category"
 msgstr ""
+
+msgctxt "#32009"
+msgid "Mark as watched/unwatched"
+msgstr ""
