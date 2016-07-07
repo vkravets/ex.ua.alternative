@@ -52,11 +52,12 @@ def _media_list(path, media_listing, page=0):
     """
     Create the list of videos
     """
-    yield {
-        'label': u'<< {0}'.format(_('Home')),
-        'url': plugin.get_url(),
-        'thumb': os.path.join(icons, 'home.png')
-    }
+    if plugin.show_home:
+        yield {
+            'label': u'<< {0}'.format(_('Home')),
+            'url': plugin.get_url(),
+            'thumb': os.path.join(icons, 'home.png')
+        }
     if media_listing.original_id is not None:
         yield {
             'label': u'[{0}]'.format(_('Search in the category')),

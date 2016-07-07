@@ -15,15 +15,13 @@ SITE = 'http://www.ex.ua'
 # Extensions for supported media files
 MEDIA_EXTENSIONS = 'avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|' \
                    'mp3|aac|ogg|wav|dts|ac3|flac'
-# Regexps for parsing info about videos
 VIDEO_DETAILS = {
-    'year': ur'(?:[Гг]од|[Рр]ік).*?\s?:\s*?(\d{4})',
-    'genre': ur'[Жж]анр.*?\s?:\s+?(\w.*)',
-    'director': ur'[Рр]ежисс?[её]р.*?\s?:\s*?(\w.*)\n',
-    #'duration': ur'(?:[Пп]родолжительность|[Тт]ривалість).*?\s?:\s*?(\w.*)\n',
-    'plot': ur'(?:Опис|О фильме|Сюжет|О чем|О сериале).*?\s?:\s*?(\w.*)\n',
-    'cast': ur'(?:[ВвУу] ролях|[Аа]кт[ео]р[ыи]).*?\s?:\s*?(\w.*)\n',
-    'rating': ur'IMD[Bb].*?\s?:\s*?(\d\.\d)',
+    'year': ur'(?:[Гг]од|[Рр]ік).*?: *?(\d{4})',
+    'genre': ur'[Жж]анр.*?: *?(.*)',
+    'director': ur'[Рр]ежисс?[её]р.*?:(.*)',
+    'plot': ur'(?:Описание|О фильме|Сюжет|О чем|О сериале).*?:(.*)',
+    'cast': ur'(?:[ВвУу] ролях|[Аа]кт[ео]р[ыи]).*?:(.*)',
+    'rating': ur'IMD[Bb].*?: *?(\d\.\d)',
     }
 
 MediaCategory = namedtuple('MediaCategory', ['name', 'path', 'items'])
@@ -182,14 +180,20 @@ def parse_media_details(web_page):
         mp4 = None
     descr_table_tag = soup.find(_is_descr_table)
     if descr_table_tag is not None:
-        text = descr_table_tag.get_text('\n', strip=True)
+        # Clean the media item description
+        brs = descr_table_tag.find_all('br')
+        for br in brs:
+            br.replace_with('\n')
+        ps = descr_table_tag.find_all('p')
+        text = u''
+        for p in ps:
+            text += p.text + '\n'
         info = {}
+        # Extract info
         for detail, regex in VIDEO_DETAILS.iteritems():
-            match = re.search(regex, text, re.UNICODE | re.MULTILINE)
-            plugin.log('Match: {0}'.format(match))
+            match = re.search(regex, text, re.UNICODE)
             if match is not None:
-                plugin.log(u'Detail: {0}; match: {1}'.format(detail, match.group(1)).encode('utf-8'))
-                info[detail] = match.group(1)
+                info[detail] = match.group(1).lstrip()
         if not info.get('plot'):
             info['plot'] = text
     else:

@@ -58,3 +58,7 @@ msgstr ""
 msgctxt "#32012"
 msgid "Refine your search and try again"
 msgstr ""
+
+msgctxt "#32013"
+msgid "Show \"<< Home\" link"
+msgstr ""
