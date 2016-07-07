@@ -26,10 +26,10 @@ VIDEO_DETAILS = {
     'rating': u'IMD[Bb].*?\s?:\s*?(\d\.\d)',
     }
 
-VideoCategory = namedtuple('VideoCategory', ['name', 'path', 'items'])
-VideoList = namedtuple('VideoList', ['videos', 'prev', 'next'])
-VideoItem = namedtuple('VideoItem', ['title', 'thumb', 'path'])
-VideoDetails = namedtuple('VideoDetails', ['title', 'thumb', 'media', 'mp4', 'info'])
+MediaCategory = namedtuple('MediaCategory', ['name', 'path', 'items'])
+MediaList = namedtuple('MediaList', ['media', 'prev', 'next'])
+MediaItem = namedtuple('MediaItem', ['title', 'thumb', 'path'])
+MediaDetails = namedtuple('MediaDetails', ['title', 'thumb', 'media', 'mp4', 'info'])
 
 plugin = Plugin()
 if plugin.hq_posters:
@@ -47,18 +47,18 @@ def get_categories(path):
 
 def parse_categories(html):
     """
-    Parse video categories list
+    Parse media categories list
     """
     parse = re.findall('<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>', html, re.UNICODE)
     listing = []
     for item in parse:
-        listing.append(VideoCategory(item[0], item[1], item[2]))
+        listing.append(MediaCategory(item[0], item[1], item[2]))
     return listing
 
 
-def get_video_list(path, page=0, pages=25):
+def get_media_list(path, page=0, pages=25):
     """
-    Get the list of video articles
+    Get the list of media articles
     """
     if int(page) > 0:
         if '?r=' in path or '?s=' in path:
@@ -73,12 +73,12 @@ def get_video_list(path, page=0, pages=25):
         per = ''
     url = SITE + path + p + per
     web_page = webclient.load_page(url)
-    return parse_videos(web_page)
+    return parse_media_list(web_page)
 
 
-def parse_videos(web_page):
+def parse_media_list(web_page):
     """
-    Parse a video list page to get the list of videos and navigation links
+    Parse a media list page to get the list of videos and navigation links
     """
     soup = BeautifulSoup(web_page, 'html5lib')
     nav_table = soup.find('table', border='0', cellpadding='5', cellspacing='0')
@@ -97,15 +97,15 @@ def parse_videos(web_page):
         prev_page = next_page = None
     content_table = soup.find('table', width='100%', border='0', cellpadding='0', cellspacing='8')
     if content_table is not None:
-        videos = parse_video_list(content_table)
+        media = parse_media_items(content_table)
     else:
-        videos = []
-    return VideoList(videos, prev_page, next_page)
+        media = []
+    return MediaList(media, prev_page, next_page)
 
 
-def parse_video_list(content_table):
+def parse_media_items(content_table):
     """
-    Parse the list of videos
+    Parse the list of media
     """
     content_cells = content_table.find_all('td')
     listing = []
@@ -120,18 +120,18 @@ def parse_video_list(content_table):
                 else:
                     thumb = ''
                     title = link_tag.text
-                listing.append(VideoItem(title, thumb, link_tag['href']))
+                listing.append(MediaItem(title, thumb, link_tag['href']))
         except TypeError:
             pass
     return listing
 
 
-def get_video_details(path):
+def get_media_details(path):
     """
     Get video details.
     """
     web_page = webclient.load_page(SITE + path)
-    return parse_video_details(web_page)
+    return parse_media_details(web_page)
 
 
 def _is_descr_table(tag):
@@ -145,7 +145,7 @@ def _is_descr_table(tag):
     )
 
 
-def parse_video_details(web_page):
+def parse_media_details(web_page):
     """
     Parse a video item page to extract as much details as possible
     """
@@ -185,4 +185,4 @@ def parse_video_details(web_page):
             info['plot'] = text
     else:
         info = None
-    return VideoDetails(title, thumb, media, mp4, info)
+    return MediaDetails(title, thumb, media, mp4, info)

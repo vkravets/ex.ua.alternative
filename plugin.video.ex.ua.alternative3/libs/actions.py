@@ -4,6 +4,7 @@
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
 import os
+import xbmc
 from simpleplugin import Plugin
 import exua
 
@@ -16,62 +17,66 @@ def _root():
     """
     Create plugin root listing
     """
-    categories = exua.get_categories('/{0}/video?per=32'.format(plugin.site_lang))
+    if 'video' in xbmc.getInfoLabel('Container.FolderPath'):
+        content = 'video'
+    else:
+        content = 'audio'
+    categories = exua.get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
     plugin.log(str(categories))
     for category in categories:
         yield {
             'label': u'{0} [{1}]'.format(category.name, category.items),
-            'url': plugin.get_url(action='video_list', path=category.path, page='0'),
-            'thumb': os.path.join(icons, 'video.png')
+            'url': plugin.get_url(action='media_list', path=category.path, page='0'),
+            'thumb': os.path.join(icons, content + '.png')
         }
 
 
 def root(params):
     """
-    Plugin root
+    Plugin root action
     """
     return plugin.create_listing(_root())
 
 
-def _video_list(path, page):
+def _media_list(path, page):
     """
     Create the list of videos
     """
-    videos = exua.get_video_list(path, page, plugin.itemcount)
-    plugin.log(str(videos))
+    media = exua.get_media_list(path, page, plugin.itemcount)
+    plugin.log(str(media))
     yield {
         'label': u'<< {0}'.format(_('Home')),
-        'url': plugin.get_url(action='root'),
+        'url': plugin.get_url(),
         'thumb': os.path.join(icons, 'home.png')
     }
-    if videos.prev is not None:
+    if media.prev is not None:
         yield {
-            'label': u'{0} < {1}'.format(videos.prev, _('Previous')),
-            'url': plugin.get_url(action='video_list', path=path, page=str(page - 1)),
+            'label': u'{0} < {1}'.format(media.prev, _('Previous')),
+            'url': plugin.get_url(action='media_list', path=path, page=str(page - 1)),
             'thumb': os.path.join(icons, 'previous.png')
         }
-    for item in videos.videos:
+    for item in media.media:
         yield {
             'label': item.title,
             'url': plugin.get_url(action='display_path', path=item.path),
             'thumb': item.thumb
         }
-    if videos.next is not None:
+    if media.next is not None:
         yield {
-            'label': u'{0} > {1}'.format(_('Next'), videos.next),
-            'url': plugin.get_url(action='video_list', path=path, page=str(page + 1)),
+            'label': u'{0} > {1}'.format(_('Next'), media.next),
+            'url': plugin.get_url(action='media_list', path=path, page=str(page + 1)),
             'thumb': os.path.join(icons, 'next.png')
         }
 
 
-def video_list(params):
+def media_list(params):
     """
     Display the list of videos
 
     params: action, path, page
     """
     page = int(params['page'])
-    return plugin.create_listing(_video_list(params['path'], page), update_listing=page > 0)
+    return plugin.create_listing(_media_list(params['path'], page), update_listing=page > 0)
 
 
 def display_path(params):
@@ -79,5 +84,5 @@ def display_path(params):
 
 
 plugin.actions['root'] = root
-plugin.actions['video_list'] = video_list
+plugin.actions['media_list'] = media_list
 plugin.actions['display_path'] = display_path
