@@ -100,7 +100,7 @@ def parse_media_list(web_page):
         media = parse_media_items(content_table)
     else:
         media = []
-    original_id_tag = soup.find('input', type='hidden', original_id=True)
+    original_id_tag = soup.find('input', {'type': 'hidden', 'name': 'original_id'})
     if original_id_tag is not None:
         original_id = original_id_tag['value']
     else:
@@ -161,7 +161,7 @@ def parse_media_details(web_page):
         thumb = thumb_tag['href'][:-3] + poster_quality
     else:
         thumb = ''
-    media_tags = soup.find_all('a', title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.I))
+    media_tags = soup.find_all('a', title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE))
     media = []
     for media_tag in media_tags:
         mirror_tags = media_tag.find_next('td', class_='small').find_all('a', rel='nofollow', title=True)
