@@ -62,3 +62,7 @@ msgstr ""
 msgctxt "#32013"
 msgid "Show \"<< Home\" link"
 msgstr ""
+
+msgctxt "#32014"
+msgid "Cache pages"
+msgstr ""

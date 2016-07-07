@@ -56,7 +56,7 @@ def parse_categories(web_page):
     return listing
 
 
-def get_media_list(path, page=0, pages=25):
+def get_media_list(path, page=0, items=25):
     """
     Get the list of media articles
     """
@@ -68,7 +68,7 @@ def get_media_list(path, page=0, pages=25):
     else:
         p = ''
     if path != '/buffer':
-        per = '&per={0}'.format(pages)
+        per = '&per={0}'.format(items)
     else:
         per = ''
     url = SITE + path + p + per

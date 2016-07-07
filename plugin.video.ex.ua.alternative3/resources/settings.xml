@@ -9,5 +9,7 @@
       label="32003" default="false"/>
     <setting id="show_home" type="bool"
       label="32013" default="false"/>
+    <setting id="cache_pages" type="bool"
+      label="32014" default="true"/>
   </category>
 </settings>

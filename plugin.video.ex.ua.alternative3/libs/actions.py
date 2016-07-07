@@ -38,12 +38,20 @@ def _media_categories(categories, content):
     }
 
 
+@plugin.cached(180)
+def _get_categories(path):
+    return exua.get_categories(path)
+
+
 def root(params):
     """
     Plugin root action
     """
     content = _get_plugin_content_type(xbmc.getInfoLabel('Container.FolderPath'))
-    categories = exua.get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
+    if plugin.cache_pages:
+        categories = _get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
+    else:
+        categories = exua.get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
     plugin.log(str(categories))
     return plugin.create_listing(_media_categories(categories, content))
 
@@ -84,6 +92,11 @@ def _media_list(path, media_listing, page=0):
         }
 
 
+@plugin.cached(30)
+def _get_media_list(path, page, items):
+    return exua.get_media_list(path, page, items)
+
+
 def media_list(params):
     """
     Display the list of videos
@@ -91,7 +104,10 @@ def media_list(params):
     params: path, page
     """
     page = int(params['page'])
-    media_listing = exua.get_media_list(params['path'], page, plugin.itemcount)
+    if plugin.cache_pages:
+        media_listing = _get_media_list(params['path'], page, plugin.itemcount)
+    else:
+        media_listing = exua.get_media_list(params['path'], page, plugin.itemcount)
     plugin.log(str(media_listing))
     return plugin.create_listing(_media_list(params['path'], media_listing, page), update_listing=page > 0)
 
@@ -139,13 +155,21 @@ def _media_info(media_details):
             }
 
 
+@plugin.cached(180)
+def _detect_page_type(path):
+    return exua.detect_page_type(path)
+
+
 def display_path(params):
     """
     Display a ex.ua page depending on its type
 
     params: path
     """
-    result = exua.detect_page_type(params['path'])
+    if plugin.cache_pages:
+        result = _detect_page_type(params['path'])
+    else:
+        result = exua.detect_page_type(params['path'])
     content = None
     if result.type == 'media_page':
         listing = _media_info(result.content)
