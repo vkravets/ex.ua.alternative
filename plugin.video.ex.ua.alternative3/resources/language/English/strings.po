@@ -170,3 +170,19 @@ msgstr ""
 msgctxt "#32040"
 msgid "Check your login and password, and try again."
 msgstr ""
+
+msgctxt "#32041"
+msgid "ex.ua content"
+msgstr ""
+
+msgctxt "#32042"
+msgid "Video and Audio"
+msgstr ""
+
+msgctxt "#32043"
+msgid "Video"
+msgstr ""
+
+msgctxt "#32044"
+msgid "Audio"
+msgstr ""
