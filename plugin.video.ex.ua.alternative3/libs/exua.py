@@ -49,7 +49,7 @@ def parse_categories(web_page):
     """
     Parse media categories list
     """
-    parse = re.findall('<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>', web_page, re.UNICODE)
+    parse = re.findall('<b>(.*?)</b></a><p><a href=\'(.*?)\' class=info>(.*?)</a>', web_page)
     listing = []
     for item in parse:
         listing.append(MediaCategory(item[0], item[1], item[2]))
@@ -80,7 +80,7 @@ def parse_media_list(web_page):
     """
     Parse a media list page to get the list of videos and navigation links
     """
-    soup = BeautifulSoup(web_page, 'html5lib')
+    soup = BeautifulSoup(web_page, 'html.parser')
     nav_table = soup.find('table', border='0', cellpadding='5', cellspacing='0')
     if nav_table is not None:
         prev_tag = nav_table.find('img', src='/t3/arr_l.gif')
@@ -155,13 +155,17 @@ def parse_media_details(web_page):
     Parse a video item page to extract as much details as possible
     """
     soup = BeautifulSoup(web_page, 'html5lib')
-    title = soup.find('h1').text
-    thumb_tag = soup.find('link', rel='image_src')
-    if thumb_tag is not None:
-        thumb = thumb_tag['href'][:-3] + poster_quality
-    else:
-        thumb = ''
-    media_tags = soup.find_all('a', title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE))
+    # Try to extract tags with links to media files
+    media_tags = soup.find_all('a',
+                                title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE),
+                                rel='nofollow')
+    if not media_tags:
+        # Change parser if not tags found (probably of malformed htmel)
+        soup = BeautifulSoup(web_page, 'html.parser')
+        media_tags = soup.find_all('a',
+                                   title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE),
+                                   rel='nofollow')
+    # Extract mediafiles
     files = []
     for media_tag in media_tags:
         mirror_tags = media_tag.find_next('td', class_='small').find_all('a', rel='nofollow', title=True)
@@ -170,6 +174,7 @@ def parse_media_details(web_page):
             for mirror_tag in mirror_tags:
                 mirrors.append(mirror_tag['href'])
         files.append(MediaFile(media_tag.text, media_tag['href'], mirrors))
+    # Extract ligtweight videos
     mp4_regex = re.compile('player_list = \'(.*)\';')
     var_player_list = soup.find('script', text=mp4_regex)
     if var_player_list is not None:
@@ -178,6 +183,14 @@ def parse_media_details(web_page):
             mp4.append(mp4_item['url'])
     else:
         mp4 = None
+    # Extract title and poster
+    title = soup.find('h1').text
+    thumb_tag = soup.find('link', rel='image_src')
+    if thumb_tag is not None:
+        thumb = thumb_tag['href'][:-3]
+    else:
+        thumb = ''
+    # Extract description if possible
     descr_table_tag = soup.find(_is_descr_table)
     if descr_table_tag is not None:
         # Clean the media item description
@@ -191,7 +204,7 @@ def parse_media_details(web_page):
         info = {}
         # Extract info
         for detail, regex in VIDEO_DETAILS.iteritems():
-            match = re.search(regex, text, re.UNICODE)
+            match = re.search(regex, text)
             if match is not None:
                 info[detail] = match.group(1).lstrip()
         if not info.get('plot'):
