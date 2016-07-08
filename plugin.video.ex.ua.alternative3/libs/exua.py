@@ -18,9 +18,9 @@ MEDIA_EXTENSIONS = 'avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip
                    'mp3|aac|ogg|wav|dts|ac3|flac'
 VIDEO_DETAILS = {
     'year': ur'(?:[Гг]од|[Рр]ік).*?: *?(\d{4})',
-    'genre': ur'[Жж]анр.*?: *?(.*)',
+    'genre': ur'[Жж]анр.*?:(.*)',
     'director': ur'[Рр]ежисс?[её]р.*?:(.*)',
-    'plot': ur'(?:Описание|О фильме|Сюжет|О чем|О сериале).*?:(.*)',
+    'plot': ur'(?:Описание|О фильме|Сюжет|О чем|О сериале).*?:\n?(.*)',
     'cast': ur'(?:[ВвУу] ролях|[Аа]кт[ео]р[ыи]).*?:(.*)',
     'rating': ur'IMD[Bb].*?: *?(\d\.\d)',
     }
