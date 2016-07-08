@@ -338,7 +338,7 @@ def bookmarks(params):
                                                captcha_value=login_dialog.captcha_text,
                                                captcha_id=captcha.captcha_id)
             if successful_login:
-                plugin.addon.setSetting('username', login_dialog.username)
+                plugin.set_setting('username', login_dialog.username)
                 if plugin.save_pass:
                     plugin.set_setting('password', webclient.encode(login_dialog.password))
                 else:
