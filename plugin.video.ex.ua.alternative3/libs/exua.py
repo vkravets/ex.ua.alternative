@@ -5,6 +5,7 @@
 
 import ast
 import re
+import sys
 from collections import namedtuple
 from bs4 import BeautifulSoup
 from simpleplugin import Plugin
@@ -80,7 +81,11 @@ def parse_media_list(web_page):
     """
     Parse a media list page to get the list of videos and navigation links
     """
-    soup = BeautifulSoup(web_page, 'html.parser')
+    # html.parser is faster but does not work properly on Python < 2.7.3
+    if sys.version_info[1] >= 7 and sys.version_info[2] >= 3:
+        soup = BeautifulSoup(web_page, 'html.parser')
+    else:
+        soup = BeautifulSoup(web_page, 'html5lib')
     nav_table = soup.find('table', border='0', cellpadding='5', cellspacing='0')
     if nav_table is not None:
         prev_tag = nav_table.find('img', src='/t3/arr_l.gif')
@@ -159,8 +164,10 @@ def parse_media_details(web_page):
     media_tags = soup.find_all('a',
                                 title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE),
                                 rel='nofollow')
-    if not media_tags:
-        # Change parser if not tags found (probably of malformed htmel)
+    # Try to use html.parser if no tags found (probably of malformed html).
+    # This is only for Python 2.7.3 and above because on lower versions
+    # html.parser does not work properly.
+    if not media_tags and sys.version_info[1] >= 7 and sys.version_info[2] >= 3:
         soup = BeautifulSoup(web_page, 'html.parser')
         media_tags = soup.find_all('a',
                                    title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE),
@@ -174,7 +181,7 @@ def parse_media_details(web_page):
             for mirror_tag in mirror_tags:
                 mirrors.append(mirror_tag['href'])
         files.append(MediaFile(media_tag.text, media_tag['href'], mirrors))
-    # Extract ligtweight videos
+    # Extract ligtweight mp4 videos
     mp4_regex = re.compile('player_list = \'(.*)\';')
     var_player_list = soup.find('script', text=mp4_regex)
     if var_player_list is not None:
@@ -191,26 +198,27 @@ def parse_media_details(web_page):
     else:
         thumb = ''
     # Extract description if possible
+    info = {}
     descr_table_tag = soup.find(_is_descr_table)
     if descr_table_tag is not None:
-        # Clean the media item description
-        brs = descr_table_tag.find_all('br')
-        for br in brs:
-            br.replace_with('\n')
-        ps = descr_table_tag.find_all('p')
-        text = u''
-        for p in ps:
-            text += p.text + '\n'
-        info = {}
-        # Extract info
-        for detail, regex in VIDEO_DETAILS.iteritems():
-            match = re.search(regex, text)
-            if match is not None:
-                info[detail] = match.group(1).lstrip()
-        if not info.get('plot'):
-            info['plot'] = text
-    else:
-        info = None
+        try:
+            # Clean the media item description
+            brs = descr_table_tag.find_all('br')
+            for br in brs:
+                br.replace_with('\n')
+            ps = descr_table_tag.find_all('p')
+            text = u''
+            for p in ps:
+                text += p.text + '\n'
+            # Extract info
+            for detail, regex in VIDEO_DETAILS.iteritems():
+                match = re.search(regex, text)
+                if match is not None:
+                    info[detail] = match.group(1).lstrip()
+            if not info.get('plot'):
+                info['plot'] = text
+        except AttributeError:  # May throw on malformed html
+            pass
     return MediaDetails(title, thumb, files, mp4, info)
 
 
