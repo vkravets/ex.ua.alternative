@@ -3,6 +3,9 @@
 # E-mail: romanvm@yandex.ua
 # Licence:     GPL v.3: http://www.gnu.org/copyleft/gpl.html
 
+# This plugin uses my SimplePlugin library:
+# https://github.com/romanvm/script.module.simpleplugin
+
 import os
 import urllib
 from collections import namedtuple
@@ -223,6 +226,9 @@ def search(params):
 
 
 def search_history(params):
+    """
+    Show search hisry
+    """
     listing = []
     with plugin.get_storage() as storage:
         history = storage.get('history', [])
@@ -239,7 +245,36 @@ def search_history(params):
 
 
 def play(params):
-    return exua.SITE + params['path']
+    """
+    Play a media file
+
+    params: path, mirrors, mp4
+    """
+    path = params['path']
+    mirrors = params.get('mirrors', [])
+    mp4 = params.get('mp4')
+    if mirrors or mp4:
+        if plugin.choose_mirrors == 1:
+            menu_items = []
+            paths = []
+            for index, mirror in enumerate(mirrors):
+                menu_items.append(_('Mirror {0}').format(index + 1))
+                paths.append(mirror)
+            menu_items.insert(0, _('Original media'))
+            paths.insert(0, path)
+            if mp4:
+                menu_items.append(_('Lightweight version'))
+                paths.append(mp4)
+            selection = xbmcgui.Dialog().select(_('Select media to play'), menu_items)
+            if selection >= 0:
+                path = paths[selection]
+            else:
+                return plugin.resolve_url('', succeeded=False)
+        elif plugin.choose_mirrors == 2 and mp4:
+            path = mp4
+    if exua.SITE not in path:
+        path = exua.SITE + path
+    return path
 
 
 plugin.actions['root'] = root

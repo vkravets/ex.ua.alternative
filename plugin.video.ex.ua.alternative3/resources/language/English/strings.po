@@ -78,3 +78,27 @@ msgstr ""
 msgctxt "#32017"
 msgid "Search history"
 msgstr ""
+
+msgctxt "#32018"
+msgid "Mediafile selection method"
+msgstr ""
+
+msgctxt "#32019"
+msgid "Original media"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Selection dialog"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Lightweight version"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Mirror {0}"
+msgstr ""
+
+msgctxt "#32023"
+msgid "Select media to play"
+msgstr ""
