@@ -67,7 +67,7 @@ def root(params):
     return plugin.create_listing(_media_categories(categories, content))
 
 
-def _media_list(path, media_listing, page=0):
+def _media_list(path, media_listing, page=0, is_search_result=False):
     """
     Create the list of videos
     """
@@ -77,7 +77,7 @@ def _media_list(path, media_listing, page=0):
             'url': plugin.get_url(),
             'thumb': os.path.join(icons, 'home.png')
         }
-    if media_listing.original_id is not None:
+    if media_listing.original_id is not None and not page and not is_search_result:
         yield {
             'label': u'[{0}]'.format(_('Search in the category...')),
             'url': plugin.get_url(action='search', original_id=media_listing.original_id),
@@ -120,7 +120,11 @@ def media_list(params):
     else:
         media_listing = exua.get_media_list(params['path'], page, plugin.itemcount)
     plugin.log('Media list: {0}'.format(media_listing))
-    return plugin.create_listing(_media_list(params['path'], media_listing, page), update_listing=page > 0)
+    return plugin.create_listing(_media_list(params['path'],
+                                             media_listing,
+                                             page,
+                                             params.get('is_search_result')),
+                                 update_listing=page > 0)
 
 
 def _media_info(media_details):
@@ -210,10 +214,13 @@ def search(params):
         search_path = '/search?s={0}'.format(urllib.quote_plus(search_text))
         if params.get('original_id'):
             search_path += '&original_id={0}'.format(params['original_id'])
-        results = exua.get_media_list(search_path, 0, plugin.itemcount)
+        if plugin.cache_pages:
+            results = _get_media_list(search_path, 0, plugin.itemcount)
+        else:
+            results = exua.get_media_list(search_path, 0, plugin.itemcount)
         plugin.log('Search results: {0}'.format(results))
         if results.media:
-            listing = _media_list(search_path, results)
+            listing = _media_list(search_path, results, is_search_result=True)
             if plugin.savesearch:
                 with plugin.get_storage('__history__.pcl') as storage:
                     history = storage.get('history', [])
@@ -240,7 +247,7 @@ def search_history(params):
         for item in history:
             listing.append({
                 'label': item.query,
-                'url': plugin.get_url(action='media_list', path=item.path, page='0'),
+                'url': plugin.get_url(action='media_list', path=item.path, page='0', is_search_result='true'),
                 'thumb': os.path.join(icons, 'search.png')
             })
     return listing

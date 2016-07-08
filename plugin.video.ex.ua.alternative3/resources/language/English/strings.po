@@ -106,3 +106,15 @@ msgstr ""
 msgctxt "#32024"
 msgid "Navigation"
 msgstr ""
+
+msgctxt "#32025"
+msgid "Warning!"
+msgstr ""
+
+msgctxt "#32026"
+msgid "Do you really want to clear plugin cache?"
+msgstr ""
+
+msgctxt "#32027"
+msgid "Plugin cache cleaned successfully"
+msgstr ""
