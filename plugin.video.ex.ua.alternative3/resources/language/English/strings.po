@@ -186,3 +186,27 @@ msgstr ""
 msgctxt "#32044"
 msgid "Audio"
 msgstr ""
+
+msgctxt "#32045"
+msgid "Clear cache"
+msgstr ""
+
+msgctxt "#32046"
+msgid "Clear search history"
+msgstr ""
+
+msgctxt "#32047"
+msgid "Do you really want to clear search history?"
+msgstr ""
+
+msgctxt "#32048"
+msgid "Search history cleaned successfully"
+msgstr ""
+
+msgctxt "#32049"
+msgid "Do you really want to clear cookies?"
+msgstr ""
+
+msgctxt "#32050"
+msgid "Cookies cleaned successfully"
+msgstr ""

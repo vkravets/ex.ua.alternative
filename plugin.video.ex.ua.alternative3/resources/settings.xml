@@ -13,12 +13,16 @@
       label="32015" default="true"/>
     <setting id="historylength" type="labelenum" values="5|10|15|20|25"
       label="32016" enable="eq(-1,true)" default = "10"/>
+    <setting type="action"
+      label="32046" action="RunScript($CWD/libs/commands.py,history)" />
   </category>
   <category label="32024">
     <setting id="itemcount" type="labelenum" values="25|50|75|100"
       label="32002" default = "25"/>
     <setting id="cache_pages" type="bool"
       label="32014" default="true"/>
+    <setting type="action"
+      label="32045" action="RunScript($CWD/libs/commands.py,cache)" />
   </category>
   <category label="32028">
     <setting id="authorization" type="bool"
