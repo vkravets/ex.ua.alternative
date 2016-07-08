@@ -162,7 +162,7 @@ def _media_info(media_details):
     Show a page with media information
     """
     for index, mediafile in enumerate(media_details.files):
-        info = {'title': media_details.title}
+        info = {}
         if media_details.info:
             if media_details.info.get('year'):
                 try:
@@ -313,6 +313,8 @@ def play(params):
             path = mp4
     if exua.SITE not in path:
         path = exua.SITE + path
+    if plugin.authorization and webclient.is_logged_in():
+        path += '|Cookie=' + urllib.quote_plus(urllib.urlencode(webclient.get_cookies()))
     plugin.log('Playing path: {0}'.format(path))
     return path
 

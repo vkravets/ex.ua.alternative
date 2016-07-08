@@ -31,7 +31,7 @@ class CookiesError(Exception):
     pass
 
 
-def _read_cookies():
+def _load_cookie_jar():
     if os.path.exists(cookies_file):
         with open(cookies_file, 'rb') as fo:
             try:
@@ -49,7 +49,7 @@ def load_page(url, post_data=None):
     session = requests.Session()
     session.headers = HEADERS.copy()
     try:
-        session.cookies = _read_cookies()
+        session.cookies = _load_cookie_jar()
     except CookiesError:
         pass
     if post_data is not None:
@@ -63,19 +63,24 @@ def load_page(url, post_data=None):
     return page
 
 
+def get_cookies():
+    """
+    Get cookies as dict
+    """
+    try:
+        cookie_jar = _load_cookie_jar()
+    except CookiesError:
+        return {}
+    else:
+        return requests.utils.dict_from_cookiejar(cookie_jar)
+
+
 def is_logged_in():
     """
     Check if cookies conatain a user ID
     """
-    result = False
-    try:
-        cookie_jar = _read_cookies()
-    except CookiesError:
-        pass
-    else:
-        cookies = requests.utils.dict_from_cookiejar(cookie_jar)
-        result = 'ukey' in cookies and len(cookies['ukey']) > 1
-    return result
+    cookies = get_cookies()
+    return 'ukey' in cookies and len(cookies['ukey']) > 1
 
 
 def check_captcha():

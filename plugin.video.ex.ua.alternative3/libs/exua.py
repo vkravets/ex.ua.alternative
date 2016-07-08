@@ -162,8 +162,8 @@ def parse_media_details(web_page):
     soup = BeautifulSoup(web_page, 'html5lib')
     # Try to extract tags with links to media files
     media_tags = soup.find_all('a',
-                                title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE),
-                                rel='nofollow')
+                               title=re.compile('^(.+\.(?:{0}))$'.format(MEDIA_EXTENSIONS), re.IGNORECASE),
+                               rel='nofollow')
     # Try to use html.parser if no tags found (probably of malformed html).
     # This is only for Python 2.7.3 and above because on lower versions
     # html.parser does not work properly.
