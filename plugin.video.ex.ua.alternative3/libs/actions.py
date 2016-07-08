@@ -125,25 +125,26 @@ def _media_info(media_details):
     Show a page with media information
     """
     for index, mediafile in enumerate(media_details.files):
-        info = {}
-        if media_details.info.get('year'):
-            try:
-                info['year'] = int(media_details.info['year'])
-            except ValueError:
-                pass
-        if media_details.info.get('genre'):
-            info['genre'] = media_details.info['genre']
-        if media_details.info.get('director'):
-            info['director'] = media_details.info['director']
-        if media_details.info.get('plot'):
-            info['plot'] = info['plotoutline'] = media_details.info['plot']
-        if media_details.info.get('cast'):
-            info['cast'] = media_details.info['cast'].split(', ')
-        if media_details.info.get('rating'):
-            try:
-                info['rating'] = float(media_details.info['rating'])
-            except ValueError:
-                pass
+        info = {'title': media_details.title}
+        if media_details.info:
+            if media_details.info.get('year'):
+                try:
+                    info['year'] = int(media_details.info['year'])
+                except ValueError:
+                    pass
+            if media_details.info.get('genre'):
+                info['genre'] = media_details.info['genre']
+            if media_details.info.get('director'):
+                info['director'] = media_details.info['director']
+            if media_details.info.get('plot'):
+                info['plot'] = info['plotoutline'] = media_details.info['plot']
+            if media_details.info.get('cast'):
+                info['cast'] = media_details.info['cast'].split(', ')
+            if media_details.info.get('rating'):
+                try:
+                    info['rating'] = float(media_details.info['rating'])
+                except ValueError:
+                    pass
         try:
             mp4 = media_details.mp4[index]
         except (IndexError, TypeError):
