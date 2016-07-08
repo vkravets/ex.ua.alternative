@@ -118,3 +118,55 @@ msgstr ""
 msgctxt "#32027"
 msgid "Plugin cache cleaned successfully"
 msgstr ""
+
+msgctxt "#32028"
+msgid "Authorization"
+msgstr ""
+
+msgctxt "#32029"
+msgid "Use ex.ua credentials"
+msgstr ""
+
+msgctxt "#32030"
+msgid "Save password (not recommended)"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Clear cookies (site logoff)"
+msgstr ""
+
+msgctxt "#32032"
+msgid "Username:"
+msgstr ""
+
+msgctxt "#32033"
+msgid "Password:"
+msgstr ""
+
+msgctxt "#32034"
+msgid "Text on the picture:"
+msgstr ""
+
+msgctxt "#32035"
+msgid "Cancel"
+msgstr ""
+
+msgctxt "#32036"
+msgid "Login"
+msgstr ""
+
+msgctxt "#32037"
+msgid "ex.ua login"
+msgstr ""
+
+msgctxt "#32038"
+msgid "My bookmarks"
+msgstr ""
+
+msgctxt "#32039"
+msgid "Login error!"
+msgstr ""
+
+msgctxt "#32040"
+msgid "Check your login and password, and try again."
+msgstr ""

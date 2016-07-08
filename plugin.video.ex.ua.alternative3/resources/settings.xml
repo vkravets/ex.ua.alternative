@@ -20,4 +20,12 @@
     <setting id="cache_pages" type="bool"
       label="32014" default="true"/>
   </category>
+  <category label="32028">
+    <setting id="authorization" type="bool"
+      label="32029" default="false"/>
+    <setting id="save_pass" type="bool"
+      label="32030" enable="eq(-1,true)" default="false"/>
+    <setting type="action"
+      label="32031" action="RunScript($CWD/libs/commands.py,cookies)" />
+  </category>
 </settings>

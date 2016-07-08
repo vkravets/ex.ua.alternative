@@ -13,6 +13,8 @@ import xbmc
 import xbmcgui
 from simpleplugin import Plugin
 import exua
+import webclient
+import login_window
 
 plugin = Plugin()
 icons = os.path.join(plugin.path, 'resources', 'icons')
@@ -47,6 +49,17 @@ def _media_categories(categories, content):
             'url': plugin.get_url(action='search_history'),
             'thumb': os.path.join(icons, 'search.png')
         }
+    if plugin.authorization:
+        item = {
+            'url': plugin.get_url(action='bookmarks')
+        }
+        if webclient.is_logged_in():
+            item['label'] = u'[{0}]'.format(_('My bookmarks'))
+            item['thumb'] = os.path.join(icons, 'bookmarks.png')
+        else:
+            item['label'] = u'[{0}]'.format(_('ex.ua login'))
+            item['thumb'] = os.path.join(icons, 'key.png')
+        yield item
 
 
 @plugin.cached(180)
@@ -287,9 +300,43 @@ def play(params):
     return path
 
 
+def bookmarks(params):
+    """
+    Login to display ex.ua bookmarks
+    """
+    successful_login = False
+    if not webclient.is_logged_in():
+        username = plugin.get_setting('username', False)
+        password = webclient.decode(plugin.get_setting('password', False))
+        captcha = webclient.check_captcha()
+        login_dialog = login_window.LoginWindow(username, password, captcha.image)
+        login_dialog.doModal()
+        if not login_dialog.login_cancelled:
+            successful_login = webclient.login(login_dialog.username,
+                                               login_dialog.password,
+                                               captcha_value=login_dialog.captcha_text,
+                                               captcha_id=captcha.captcha_id)
+            if successful_login:
+                plugin.addon.setSetting('username', login_dialog.username)
+                if plugin.save_pass:
+                    plugin.set_setting('password', webclient.encode(login_dialog.password))
+                else:
+                    plugin.set_setting('password', '')
+            else:
+                xbmcgui.Dialog().ok(_('Login error!'), _('Check your login and password, and try again.'))
+        del login_dialog
+    plugin.log('Successful_login: {0}'.format(successful_login))
+    if webclient.is_logged_in() or successful_login:
+        listing = _media_list('/buffer', exua.get_media_list('/buffer'))
+    else:
+        listing = []
+    return plugin.create_listing(listing)
+
+
 plugin.actions['root'] = root
 plugin.actions['media_list'] = media_list
 plugin.actions['display_path'] = display_path
 plugin.actions['search'] = search
 plugin.actions['play'] = play
 plugin.actions['search_history'] = search_history
+plugin.actions['bookmarks'] = bookmarks
