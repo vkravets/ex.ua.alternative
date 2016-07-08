@@ -194,7 +194,7 @@ def parse_media_details(web_page):
     title = soup.find('h1').text
     thumb_tag = soup.find('link', rel='image_src')
     if thumb_tag is not None:
-        thumb = thumb_tag['href'][:-3]
+        thumb = thumb_tag['href'][:-3] + poster_quality
     else:
         thumb = ''
     # Extract description if possible
@@ -239,6 +239,4 @@ def detect_page_type(path):
     elif '<table width=100% border=0 cellpadding=0 cellspacing=8 class=include_0>' in web_page:
         page_type = 'media_categories'
         content = parse_categories(web_page)
-    result = ExUaPage(page_type, content)
-    plugin.log(str(result))
-    return result
+    return ExUaPage(page_type, content)
