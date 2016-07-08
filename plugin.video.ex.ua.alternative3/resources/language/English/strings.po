@@ -102,3 +102,7 @@ msgstr ""
 msgctxt "#32023"
 msgid "Select media to play"
 msgstr ""
+
+msgctxt "#32024"
+msgid "Navigation"
+msgstr ""
