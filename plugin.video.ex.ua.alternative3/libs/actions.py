@@ -63,7 +63,7 @@ def root(params):
         categories = _get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
     else:
         categories = exua.get_categories('/{0}/{1}?per=32'.format(plugin.site_lang, content))
-    plugin.log(str(categories))
+    plugin.log('Media categories: {0}'.format(categories))
     return plugin.create_listing(_media_categories(categories, content))
 
 
@@ -119,7 +119,7 @@ def media_list(params):
         media_listing = _get_media_list(params['path'], page, plugin.itemcount)
     else:
         media_listing = exua.get_media_list(params['path'], page, plugin.itemcount)
-    plugin.log(str(media_listing))
+    plugin.log('Media list: {0}'.format(media_listing))
     return plugin.create_listing(_media_list(params['path'], media_listing, page), update_listing=page > 0)
 
 
@@ -182,6 +182,7 @@ def display_path(params):
         result = _detect_page_type(params['path'])
     else:
         result = exua.detect_page_type(params['path'])
+    plugin.log('Page type detection result: {0}'.format(result))
     content = None
     if result.type == 'media_page':
         listing = _media_info(result.content)
@@ -210,11 +211,11 @@ def search(params):
         if params.get('original_id'):
             search_path += '&original_id={0}'.format(params['original_id'])
         results = exua.get_media_list(search_path, 0, plugin.itemcount)
-        plugin.log('Search results:' + str(results))
+        plugin.log('Search results: {0}'.format(results))
         if results.media:
             listing = _media_list(search_path, results)
             if plugin.savesearch:
-                with plugin.get_storage() as storage:
+                with plugin.get_storage('__history__.pcl') as storage:
                     history = storage.get('history', [])
                     history.insert(0, SearchQuery(search_text, search_path))
                     if len(history) > plugin.historylength:
@@ -230,8 +231,9 @@ def search_history(params):
     Show search hisry
     """
     listing = []
-    with plugin.get_storage() as storage:
+    with plugin.get_storage('__history__.pcl') as storage:
         history = storage.get('history', [])
+        plugin.log('Search history: {0}'.format(history))
         if len(history) > plugin.historylength:
             history[plugin.historylength - len(history):] = []
             storage['history'] = history
@@ -274,6 +276,7 @@ def play(params):
             path = mp4
     if exua.SITE not in path:
         path = exua.SITE + path
+    plugin.log('Playing path: {0}'.format(path))
     return path
 
 
