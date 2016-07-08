@@ -275,7 +275,7 @@ def search_history(params):
         plugin.log('Search history: {0}'.format(history))
         if len(history) > plugin.historylength:
             history[plugin.historylength - len(history):] = []
-            storage['history'] = history
+        storage['history'] = history
         for item in history:
             listing.append({
                 'label': item.query,
