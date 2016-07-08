@@ -19,7 +19,9 @@ import login_window
 plugin = Plugin()
 icons = os.path.join(plugin.path, 'resources', 'icons')
 _ = plugin.initialize_gettext()
+
 SearchQuery = namedtuple('SearchQuery', ['query', 'path'])
+dialog = xbmcgui.Dialog()
 
 
 def _get_plugin_content_type(path):
@@ -259,7 +261,7 @@ def search(params):
                         history.pop(-1)
                     storage['history'] = history
         else:
-            xbmcgui.Dialog().ok(_('No results found'), _('Refine your search and try again'))
+            dialog.ok(_('No results found'), _('Refine your search and try again'))
     return plugin.create_listing(listing)
 
 
@@ -342,7 +344,7 @@ def bookmarks(params):
                 else:
                     plugin.set_setting('password', '')
             else:
-                xbmcgui.Dialog().ok(_('Login error!'), _('Check your login and password, and try again.'))
+                dialog.ok(_('Login error!'), _('Check your login and password, and try again.'))
         del login_dialog
         plugin.log('Successful_login: {0}'.format(successful_login))
     if webclient.is_logged_in() or successful_login:
