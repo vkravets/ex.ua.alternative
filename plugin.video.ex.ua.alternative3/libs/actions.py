@@ -24,12 +24,6 @@ SearchQuery = namedtuple('SearchQuery', ['query', 'path'])
 dialog = xbmcgui.Dialog()
 
 
-def _get_plugin_content_type(path):
-    if 'audio' in path:
-        return 'audio'
-    return 'video'
-
-
 def _media_categories(categories, content):
     """
     Create plugin root listing
@@ -226,7 +220,7 @@ def display_path(params):
     elif result.type == 'media_list':
         listing = _media_list(params['path'], result.content)
     elif result.type == 'media_categories':
-        listing = _media_categories(result.content, _get_plugin_content_type(params['path']))
+        listing = _media_categories(result.content, 'video')
     else:
         listing = []
     return plugin.create_listing(listing, content=content)

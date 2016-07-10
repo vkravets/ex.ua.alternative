@@ -181,7 +181,7 @@ def parse_media_details(web_page):
             for mirror_tag in mirror_tags:
                 mirrors.append(mirror_tag['href'])
         files.append(MediaFile(media_tag.text, media_tag['href'], mirrors))
-    # Extract ligtweight mp4 videos
+    # Extract lightweight mp4 videos
     mp4_regex = re.compile('player_list = \'(.*)\';')
     var_player_list = soup.find('script', text=mp4_regex)
     if var_player_list is not None:
