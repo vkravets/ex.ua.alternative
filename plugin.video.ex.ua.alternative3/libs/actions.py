@@ -158,10 +158,7 @@ def _media_info(media_details):
     """
     for index, mediafile in enumerate(media_details.files):
         video_info = {'title': mediafile.filename}
-        music_info = {
-            'album': media_details.title,
-            'tracknumber': index + 1
-        }
+        music_info = {'album': media_details.title, 'tracknumber': index + 1}
         if media_details.info:
             if media_details.info.get('year'):
                 try:
