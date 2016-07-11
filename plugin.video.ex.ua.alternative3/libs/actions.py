@@ -157,24 +157,28 @@ def _media_info(media_details):
     Show a page with media information
     """
     for index, mediafile in enumerate(media_details.files):
-        info = {}
+        video_info = {}
+        music_info = {
+            'album': media_details.title,
+            'tracknumber': index + 1
+        }
         if media_details.info:
             if media_details.info.get('year'):
                 try:
-                    info['year'] = int(media_details.info['year'])
+                    video_info['year'] = music_info['year'] = int(media_details.info['year'])
                 except ValueError:
                     pass
             if media_details.info.get('genre'):
-                info['genre'] = media_details.info['genre']
+                video_info['genre'] = music_info['genre'] = media_details.info['genre']
             if media_details.info.get('director'):
-                info['director'] = media_details.info['director']
+                video_info['director'] = media_details.info['director']
             if media_details.info.get('plot'):
-                info['plot'] = info['plotoutline'] = media_details.info['plot']
+                video_info['plot'] = video_info['plotoutline'] = media_details.info['plot']
             if media_details.info.get('cast'):
-                info['cast'] = media_details.info['cast'].split(', ')
+                video_info['cast'] = media_details.info['cast'].split(', ')
             if media_details.info.get('rating'):
                 try:
-                    info['rating'] = float(media_details.info['rating'])
+                    video_info['rating'] = float(media_details.info['rating'])
                 except ValueError:
                     pass
         try:
@@ -192,7 +196,7 @@ def _media_info(media_details):
                                   mp4=mp4),
             'is_playable': True,
             'context_menu': [(_('Mark as watched/unwatched'), 'Action(ToggleWatched)')],
-            'info': {'video': info}
+            'info': {'video': video_info, 'music': music_info}
             }
 
 
