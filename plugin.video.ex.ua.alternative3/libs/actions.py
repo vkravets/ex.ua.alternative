@@ -157,7 +157,7 @@ def _media_info(media_details):
     Show a page with media information
     """
     for index, mediafile in enumerate(media_details.files):
-        video_info = {}
+        video_info = {'title': mediafile.filename}
         music_info = {
             'album': media_details.title,
             'tracknumber': index + 1
