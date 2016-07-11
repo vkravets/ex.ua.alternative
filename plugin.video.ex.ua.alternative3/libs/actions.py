@@ -85,7 +85,7 @@ def root(params):
         yield {
             'label': u'[{0}]'.format(_('Search history')),
             'url': plugin.get_url(action='search_history'),
-            'thumb': os.path.join(icons, 'search.png')
+            'thumb': os.path.join(icons, 'search_history.png')
         }
     if plugin.authorization:
         bookmarks_item = {'url': plugin.get_url(action='bookmarks')}
@@ -276,7 +276,7 @@ def search_history(params):
             yield {
                 'label': item.query,
                 'url': plugin.get_url(action='media_list', path=item.path, page='0', is_search_result='true'),
-                'thumb': os.path.join(icons, 'search.png')
+                'thumb': os.path.join(icons, 'search_history.png')
             }
 
 
