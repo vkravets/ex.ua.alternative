@@ -28,14 +28,12 @@ def _media_categories(categories, content):
     """
     Create plugin root listing
     """
-    listing = []
     for category in categories:
-        listing.append({
+        yield {
             'label': u'{0} [{1}]'.format(category.name, category.items),
             'url': plugin.get_url(action='media_list', path=category.path, page='0'),
             'thumb': os.path.join(icons, content + '.png')
-        })
-    return listing
+        }
 
 
 @plugin.cached(180)
@@ -59,44 +57,45 @@ def root(params):
     """
     Plugin root action
     """
-    if plugin.content_type == 0:
-        listing = [
-            {
-                'label': u'[{0}]'.format(_('Video')),
-                'url': plugin.get_url(action='categories', content='video'),
-                'thumb': os.path.join(icons, 'video.png')
-            },
-            {
-                'label': u'[{0}]'.format(_('Audio')),
-                'url': plugin.get_url(action='categories', content='audio'),
-                'thumb': os.path.join(icons, 'audio.png')
-            },
-        ]
-    elif plugin.content_type == 1:
-        listing = media_categories({'content': 'video'})
+    if plugin.content_type:
+        if plugin.content_type == 1:
+            listing = media_categories({'content': 'video'})
+        else:
+            listing = media_categories({'content': 'audio'})
+        for item in listing:
+            yield item
     else:
-        listing = media_categories({'content': 'audio'})
-    listing.append({
+        yield {
+            'label': u'[{0}]'.format(_('Video')),
+            'url': plugin.get_url(action='categories', content='video'),
+            'thumb': os.path.join(icons, 'video.png')
+        }
+        yield {
+            'label': u'[{0}]'.format(_('Audio')),
+            'url': plugin.get_url(action='categories', content='audio'),
+            'thumb': os.path.join(icons, 'audio.png')
+        }
+
+    yield {
         'label': u'[{0}]'.format(_('Search...')),
         'url': plugin.get_url(action='search'),
         'thumb': os.path.join(icons, 'search.png')
-    })
+    }
     if plugin.savesearch:
-        listing.append({
+        yield {
             'label': u'[{0}]'.format(_('Search history')),
             'url': plugin.get_url(action='search_history'),
             'thumb': os.path.join(icons, 'search.png')
-        })
+        }
     if plugin.authorization:
-        item = {'url': plugin.get_url(action='bookmarks')}
+        bookmarks_item = {'url': plugin.get_url(action='bookmarks')}
         if webclient.is_logged_in():
-            item['label'] = u'[{0}]'.format(_('My bookmarks'))
-            item['thumb'] = os.path.join(icons, 'bookmarks.png')
+            bookmarks_item['label'] = u'[{0}]'.format(_('My bookmarks'))
+            bookmarks_item['thumb'] = os.path.join(icons, 'bookmarks.png')
         else:
-            item['label'] = u'[{0}]'.format(_('ex.ua login'))
-            item['thumb'] = os.path.join(icons, 'key.png')
-        listing.append(item)
-    return listing
+            bookmarks_item['label'] = u'[{0}]'.format(_('ex.ua login'))
+            bookmarks_item['thumb'] = os.path.join(icons, 'key.png')
+        yield bookmarks_item
 
 
 def _media_list(path, media_listing, page=0, is_search_result=False):
@@ -256,14 +255,13 @@ def search(params):
                     storage['history'] = history
         else:
             dialog.ok(_('No results found'), _('Refine your search and try again'))
-    return plugin.create_listing(listing)
+    return listing
 
 
 def search_history(params):
     """
     Show search hisry
     """
-    listing = []
     with plugin.get_storage('__history__.pcl') as storage:
         history = storage.get('history', [])
         plugin.log('Search history: {0}'.format(history))
@@ -271,12 +269,11 @@ def search_history(params):
             history[plugin.historylength - len(history):] = []
         storage['history'] = history
         for item in history:
-            listing.append({
+            yield {
                 'label': item.query,
                 'url': plugin.get_url(action='media_list', path=item.path, page='0', is_search_result='true'),
                 'thumb': os.path.join(icons, 'search.png')
-            })
-    return listing
+            }
 
 
 def play(params):
@@ -347,7 +344,7 @@ def bookmarks(params):
         listing = _media_list('/buffer', media)
     else:
         listing = []
-    return plugin.create_listing(listing)
+    return listing
 
 
 plugin.actions['root'] = root
