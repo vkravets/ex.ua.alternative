@@ -30,7 +30,7 @@ def _media_categories(categories, content):
     """
     for category in categories:
         yield {
-            'label': u'{0} [{1}]'.format(category.name, category.items),
+            'label': u'{0}  [LIGHT][{1}][/LIGHT]'.format(category.name, category.items),
             'url': plugin.get_url(action='media_list', path=category.path, page='0'),
             'thumb': os.path.join(icons, content + '.png')
         }
