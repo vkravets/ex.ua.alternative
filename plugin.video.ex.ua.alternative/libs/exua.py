@@ -26,7 +26,7 @@ VIDEO_DETAILS = {
     }
 
 MediaCategory = namedtuple('MediaCategory', ['name', 'path', 'items'])
-MediaList = namedtuple('MediaList', ['media', 'prev', 'next', 'original_id'])
+MediaList = namedtuple('MediaList', ['media', 'prev', 'next_', 'original_id'])
 MediaItem = namedtuple('MediaItem', ['title', 'thumb', 'path'])
 MediaDetails = namedtuple('MediaDetails', ['title', 'thumb', 'files', 'mp4', 'info'])
 MediaFile = namedtuple('MediaFile', ['filename', 'path', 'mirrors'])

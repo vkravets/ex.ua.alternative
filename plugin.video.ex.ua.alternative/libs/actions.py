@@ -120,9 +120,9 @@ def _media_list(path, media_listing, page=0, is_search_result=False):
             'url': plugin.get_url(action='display_path', path=item.path),
             'thumb': item.thumb
         }
-    if media_listing.next is not None:
+    if media_listing.next_ is not None:
         yield {
-            'label': '{0} > {1}'.format(_('Next'), media_listing.next),
+            'label': '{0} > {1}'.format(_('Next'), media_listing.next_),
             'url': plugin.get_url(action='media_list', path=path, page=str(page + 1)),
             'thumb': os.path.join(icons, 'next.png')
         }
