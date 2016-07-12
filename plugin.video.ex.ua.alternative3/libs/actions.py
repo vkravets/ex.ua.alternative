@@ -66,34 +66,34 @@ def root(params):
             yield item
     else:
         yield {
-            'label': u'[{0}]'.format(_('Video')),
+            'label': '[{0}]'.format(_('Video')),
             'url': plugin.get_url(action='categories', content='video'),
             'thumb': os.path.join(icons, 'video.png')
         }
         yield {
-            'label': u'[{0}]'.format(_('Audio')),
+            'label': '[{0}]'.format(_('Audio')),
             'url': plugin.get_url(action='categories', content='audio'),
             'thumb': os.path.join(icons, 'audio.png')
         }
 
     yield {
-        'label': u'[{0}]'.format(_('Search...')),
+        'label': '[{0}]'.format(_('Search...')),
         'url': plugin.get_url(action='search'),
         'thumb': os.path.join(icons, 'search.png')
     }
     if plugin.savesearch:
         yield {
-            'label': u'[{0}]'.format(_('Search history')),
+            'label': '[{0}]'.format(_('Search history')),
             'url': plugin.get_url(action='search_history'),
             'thumb': os.path.join(icons, 'search_history.png')
         }
     if plugin.authorization:
         bookmarks_item = {'url': plugin.get_url(action='bookmarks')}
         if webclient.is_logged_in():
-            bookmarks_item['label'] = u'[{0}]'.format(_('My bookmarks'))
+            bookmarks_item['label'] = '[{0}]'.format(_('My bookmarks'))
             bookmarks_item['thumb'] = os.path.join(icons, 'bookmarks.png')
         else:
-            bookmarks_item['label'] = u'[{0}]'.format(_('ex.ua login'))
+            bookmarks_item['label'] = '[{0}]'.format(_('ex.ua login'))
             bookmarks_item['thumb'] = os.path.join(icons, 'key.png')
         yield bookmarks_item
 
@@ -104,13 +104,13 @@ def _media_list(path, media_listing, page=0, is_search_result=False):
     """
     if media_listing.original_id is not None and not page and not is_search_result:
         yield {
-            'label': u'[{0}]'.format(_('Search in the category...')),
+            'label': '[{0}]'.format(_('Search in the category...')),
             'url': plugin.get_url(action='search', original_id=media_listing.original_id),
             'thumb': os.path.join(icons, 'search.png')
         }
     if media_listing.prev is not None:
         yield {
-            'label': u'{0} < {1}'.format(media_listing.prev, _('Previous')),
+            'label': '{0} < {1}'.format(media_listing.prev, _('Previous')),
             'url': plugin.get_url(action='media_list', path=path, page=str(page - 1)),
             'thumb': os.path.join(icons, 'previous.png')
         }
@@ -122,7 +122,7 @@ def _media_list(path, media_listing, page=0, is_search_result=False):
         }
     if media_listing.next is not None:
         yield {
-            'label': u'{0} > {1}'.format(_('Next'), media_listing.next),
+            'label': '{0} > {1}'.format(_('Next'), media_listing.next),
             'url': plugin.get_url(action='media_list', path=path, page=str(page + 1)),
             'thumb': os.path.join(icons, 'next.png')
         }
