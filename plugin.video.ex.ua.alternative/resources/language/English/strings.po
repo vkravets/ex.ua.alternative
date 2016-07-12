@@ -210,3 +210,7 @@ msgstr ""
 msgctxt "#32050"
 msgid "Cookies cleaned successfully"
 msgstr ""
+
+msgctxt "#32051"
+msgid "Show info"
+msgstr ""

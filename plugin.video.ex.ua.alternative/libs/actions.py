@@ -192,7 +192,10 @@ def _media_info(media_details):
                                   mirrors=mediafile.mirrors,
                                   mp4=mp4),
             'is_playable': True,
-            'context_menu': [(_('Mark as watched/unwatched'), 'Action(ToggleWatched)')],
+            'context_menu': [
+                (_('Show info'), 'Action(Info)'),
+                (_('Mark as watched/unwatched'), 'Action(ToggleWatched)'),
+                ],
             'info': {'video': video_info, 'music': music_info}
             }
 
