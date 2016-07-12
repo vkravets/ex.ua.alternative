@@ -308,7 +308,7 @@ def play(params):
     if exua.SITE not in path:
         path = exua.SITE + path
     if plugin.authorization and webclient.is_logged_in():
-        path += '|Cookie=' + urllib.quote_plus(urllib.urlencode(webclient.get_cookies()))
+        path += '|Cookie=' + urllib.quote_plus(urllib.urlencode(webclient.get_cookies()).replace('&', '; '))
     plugin.log('Playing path: {0}'.format(path))
     return path
 
