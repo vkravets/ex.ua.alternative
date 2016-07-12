@@ -40,11 +40,11 @@ msgstr "Вперед"
 
 msgctxt "#32007"
 msgid "Search..."
-msgstr "Поиск"
+msgstr "Поиск..."
 
 msgctxt "#32008"
 msgid "Search in the category..."
-msgstr "Поиск в категории"
+msgstr "Поиск в категории..."
 
 msgctxt "#32009"
 msgid "Mark as watched/unwatched"
@@ -213,3 +213,7 @@ msgstr "Действительно очистить куки?"
 msgctxt "#32050"
 msgid "Cookies cleaned successfully"
 msgstr "Куки успешно очищены"
+
+msgctxt "#32051"
+msgid "Show info"
+msgstr "Сведения"
