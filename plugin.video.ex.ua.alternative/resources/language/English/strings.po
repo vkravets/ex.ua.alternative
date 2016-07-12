@@ -84,7 +84,7 @@ msgid "Mediafile selection method"
 msgstr ""
 
 msgctxt "#32019"
-msgid "Original media"
+msgid "Default"
 msgstr ""
 
 msgctxt "#32020"

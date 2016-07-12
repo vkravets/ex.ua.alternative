@@ -87,7 +87,7 @@ msgid "Mediafile selection method"
 msgstr "Метод вибору медіафайлу"
 
 msgctxt "#32019"
-msgid "Original media"
+msgid "Default"
 msgstr "За замовчуванням"
 
 msgctxt "#32020"
