@@ -302,7 +302,7 @@ def play(params):
             if selection >= 0:
                 path = paths[selection]
             else:
-                return plugin.resolve_url('', succeeded=False)
+                return plugin.resolve_url(succeeded=False)
         elif plugin.choose_mirrors == 2 and mp4:
             path = mp4
     if exua.SITE not in path:
