@@ -299,7 +299,7 @@ def play(params):
             if mp4:
                 menu_items.append(_('Lightweight version'))
                 paths.append(mp4)
-            selection = xbmcgui.Dialog().select(_('Select media to play'), menu_items)
+            selection = dialog.select(_('Select media to play'), menu_items)
             if selection >= 0:
                 path = paths[selection]
             else:
