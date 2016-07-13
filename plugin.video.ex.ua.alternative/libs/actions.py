@@ -259,7 +259,7 @@ def search(params):
                     storage['history'] = history
         else:
             dialog.ok(_('No results found'), _('Refine your search and try again'))
-    return listing
+    return plugin.create_listing(listing, cache_to_disk=True)
 
 
 def search_history(params):
