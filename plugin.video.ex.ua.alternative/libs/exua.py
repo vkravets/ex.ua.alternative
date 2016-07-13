@@ -144,6 +144,9 @@ def get_media_details(path):
 
 
 def _is_descr_table(tag):
+    """
+    Detect table tag containing media description
+    """
     return (
         tag.name == 'table' and
         tag.has_attr('width') and
@@ -152,6 +155,34 @@ def _is_descr_table(tag):
         tag.has_attr('border') and
         not tag.has_attr('height')
     )
+
+
+def _parse_media_info(soup):
+    """
+    Extract media description if possible
+    """
+    info = {}
+    descr_table_tag = soup.find(_is_descr_table)
+    if descr_table_tag is not None:
+        try:
+            # Clean the media item description
+            brs = descr_table_tag.find_all('br')
+            for br in brs:
+                br.replace_with('\n')
+            ps = descr_table_tag.find_all('p')
+            text = u''
+            for p in ps:
+                text += p.text + '\n'
+            # Extract info
+            for detail, regex in VIDEO_DETAILS.iteritems():
+                match = re.search(regex, text)
+                if match is not None:
+                    info[detail] = match.group(1).lstrip()
+            if not info.get('plot'):
+                info['plot'] = text
+        except AttributeError:  # May throw on malformed html
+            pass
+    return info
 
 
 def parse_media_details(web_page):
@@ -196,29 +227,7 @@ def parse_media_details(web_page):
         thumb = thumb_tag['href'][:-3] + poster_quality
     else:
         thumb = ''
-    # Extract description if possible
-    info = {}
-    descr_table_tag = soup.find(_is_descr_table)
-    if descr_table_tag is not None:
-        try:
-            # Clean the media item description
-            brs = descr_table_tag.find_all('br')
-            for br in brs:
-                br.replace_with('\n')
-            ps = descr_table_tag.find_all('p')
-            text = u''
-            for p in ps:
-                text += p.text + '\n'
-            # Extract info
-            for detail, regex in VIDEO_DETAILS.iteritems():
-                match = re.search(regex, text)
-                if match is not None:
-                    info[detail] = match.group(1).lstrip()
-            if not info.get('plot'):
-                info['plot'] = text
-        except AttributeError:  # May throw on malformed html
-            pass
-    return MediaDetails(title, thumb, files, mp4, info)
+    return MediaDetails(title, thumb, files, mp4, _parse_media_info(soup))
 
 
 def detect_page_type(path):
