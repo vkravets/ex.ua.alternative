@@ -26,7 +26,7 @@ dialog = xbmcgui.Dialog()
 
 def _media_categories(categories, content):
     """
-    Create plugin root listing
+    Create media categories listing
     """
     for category in categories:
         yield {
@@ -57,25 +57,23 @@ def root(params):
     """
     Plugin root action
     """
-    if plugin.content_type:
-        if plugin.content_type == 1:
-            listing = media_categories({'content': 'video'})
-        else:
-            listing = media_categories({'content': 'audio'})
-        for item in listing:
-            yield item
+    if plugin.content_type == 1:
+        listing = media_categories({'content': 'video'})
+    elif plugin.content_type == 2:
+        listing = media_categories({'content': 'audio'})
     else:
-        yield {
-            'label': '[{0}]'.format(_('Video')),
-            'url': plugin.get_url(action='categories', content='video'),
-            'thumb': os.path.join(icons, 'video.png')
-        }
-        yield {
-            'label': '[{0}]'.format(_('Audio')),
-            'url': plugin.get_url(action='categories', content='audio'),
-            'thumb': os.path.join(icons, 'audio.png')
-        }
-
+        listing = [
+            {'label': '[{0}]'.format(_('Video')),
+             'url': plugin.get_url(action='categories', content='video'),
+             'thumb': os.path.join(icons, 'video.png')
+             },
+            {'label': '[{0}]'.format(_('Audio')),
+             'url': plugin.get_url(action='categories', content='audio'),
+             'thumb': os.path.join(icons, 'audio.png')
+             }
+        ]
+    for item in listing:
+        yield item
     yield {
         'label': '[{0}]'.format(_('Search...')),
         'url': plugin.get_url(action='search'),
@@ -233,7 +231,7 @@ def search(params):
     """
     Search on ex.ua
 
-    params: oritinal_id (optional)
+    params: original_id (optional)
     """
     listing = []
     keyboard = xbmc.Keyboard('', _('Search query'))
@@ -264,7 +262,7 @@ def search(params):
 
 def search_history(params):
     """
-    Show search hisry
+    Show search history
     """
     with plugin.get_storage('__history__.pcl') as storage:
         history = storage.get('history', [])
