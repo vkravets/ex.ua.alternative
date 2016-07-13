@@ -60,7 +60,7 @@ def get_media_list(path, page=0, items=25):
     """
     Get the list of media articles
     """
-    if int(page) > 0:
+    if page:
         if '?r=' in path or '?s=' in path:
             p = '&p={0}'.format(page)
         else:
