@@ -101,7 +101,7 @@ def parse_media_list(web_page):
         prev_page = next_page = None
     content_table = soup.find('table', width='100%', border='0', cellpadding='0', cellspacing='8')
     if content_table is not None:
-        media = parse_media_items(content_table)
+        media = _parse_media_items(content_table)
     else:
         media = []
     original_id_tag = soup.find('input', {'type': 'hidden', 'name': 'original_id'})
@@ -112,7 +112,7 @@ def parse_media_list(web_page):
     return MediaList(media, prev_page, next_page, original_id)
 
 
-def parse_media_items(content_table):
+def _parse_media_items(content_table):
     """
     Parse the list of media
     """
