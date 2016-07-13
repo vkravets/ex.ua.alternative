@@ -14,8 +14,7 @@ import webclient
 SITE = 'http://www.ex.ua'
 
 # Extensions for supported media files
-MEDIA_EXTENSIONS = 'avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|iso|mov|wmv|rar|zip|' \
-                   'mp3|aac|ogg|wav|dts|ac3|flac'
+MEDIA_EXTENSIONS = 'avi|mkv|ts|m2ts|mp4|m4v|flv|vob|mpg|mpeg|mov|wmv|mp3|aac|ogg|wav|dts|ac3|flac|m4a|wma'
 VIDEO_DETAILS = {
     'year': ur'(?:[Гг]од|[Рр]ік).*?: *?(\d{4})',
     'genre': ur'[Жж]анр.*?:(.*)',
