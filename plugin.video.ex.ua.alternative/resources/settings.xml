@@ -32,4 +32,8 @@
     <setting type="action"
       label="32031" action="RunScript($CWD/libs/commands.py,cookies)" />
   </category>
+  <category label="32052">
+    <setting id="extract_full_info" type="bool"
+      label="32053" default="false"/>
+  </category>
 </settings>
