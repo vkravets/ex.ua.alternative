@@ -214,11 +214,3 @@ msgstr ""
 msgctxt "#32051"
 msgid "Show info"
 msgstr ""
-
-msgctxt "#32052"
-msgid "Advanced"
-msgstr ""
-
-msgctxt "#32053"
-msgid "Always extract full info (slower)"
-msgstr ""
