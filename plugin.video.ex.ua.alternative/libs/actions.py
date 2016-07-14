@@ -318,8 +318,9 @@ def bookmarks(params):
     """
     Login to display ex.ua bookmarks
     """
-    successful_login = False
     if not webclient.is_logged_in():
+        plugin.log('Trying to login to ex.ua')
+        successful_login = False
         username = plugin.get_setting('username', False)
         password = webclient.decode(plugin.get_setting('password', False))
         captcha = webclient.check_captcha()
@@ -337,10 +338,11 @@ def bookmarks(params):
                 else:
                     plugin.set_setting('password', '')
             else:
+                plugin.log('ex.ua login error')
                 dialog.ok(_('Login error!'), _('Check your login and password, and try again.'))
         del login_dialog
         plugin.log('Successful_login: {0}'.format(successful_login))
-    if webclient.is_logged_in() or successful_login:
+    if webclient.is_logged_in():
         media = exua.get_media_list('/buffer')
         plugin.log('My bookmarks: {0}'.format(media))
         listing = _media_list('/buffer', media)
