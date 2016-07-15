@@ -106,9 +106,9 @@ def _media_list(path, media_listing, page=0, is_search_result=False):
             'url': plugin.get_url(action='search', original_id=media_listing.original_id),
             'thumb': os.path.join(icons, 'search.png')
         }
-    if media_listing.prev is not None:
+    if media_listing.prev_page is not None:
         yield {
-            'label': '{0} < {1}'.format(media_listing.prev, _('Previous')),
+            'label': '{0} < {1}'.format(media_listing.prev_page, _('Previous')),
             'url': plugin.get_url(action='media_list', path=path, page=str(page - 1)),
             'thumb': os.path.join(icons, 'previous.png')
         }
@@ -118,9 +118,9 @@ def _media_list(path, media_listing, page=0, is_search_result=False):
             'url': plugin.get_url(action='display_path', path=item.path),
             'thumb': item.thumb
         }
-    if media_listing.next_ is not None:
+    if media_listing.next_page is not None:
         yield {
-            'label': '{0} > {1}'.format(_('Next'), media_listing.next_),
+            'label': '{0} > {1}'.format(_('Next'), media_listing.next_page),
             'url': plugin.get_url(action='media_list', path=path, page=str(page + 1)),
             'thumb': os.path.join(icons, 'next.png')
         }
