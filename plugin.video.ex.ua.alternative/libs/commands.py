@@ -15,6 +15,9 @@ basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 with open(os.path.join(basedir, 'addon.xml')) as fo:
     addon_id = re.search(r'addon id="(.+?)"', fo.read()).group(1)
 
+# Here I use the vanilla Kodi Python API instead of SimplePlugin
+# because using library addons in non-addon scripts
+# may be depreciated in the future (according to a warning in the Kodi log).
 addon = Addon(addon_id)
 config_dir = xbmc.translatePath(addon.getAddonInfo('profile')).decode('utf-8')
 icon = os.path.join(basedir, 'icon.png')
