@@ -320,29 +320,30 @@ def bookmarks(params):
     """
     if not webclient.is_logged_in():
         plugin.log('Trying to login to ex.ua')
-        successful_login = False
         username = plugin.get_setting('username', False)
         password = webclient.decode(plugin.get_setting('password', False))
         captcha = webclient.check_captcha()
         login_dialog = login_window.LoginWindow(username, password, captcha.image)
         login_dialog.doModal()
         if not login_dialog.login_cancelled:
-            successful_login = webclient.login(login_dialog.username,
-                                               login_dialog.password,
-                                               captcha_value=login_dialog.captcha_text,
-                                               captcha_id=captcha.captcha_id)
-            if successful_login:
+            try:
+                webclient.login(login_dialog.username,
+                                login_dialog.password,
+                                captcha.captcha_id,
+                                login_dialog.captcha_text,)
+            except webclient.LoginError:
+                plugin.log('ex.ua login error')
+                dialog.ok(_('Login error!'), _('Check your login and password, and try again.'))
+            else:
+                plugin.log('Successful login to ex.ua')
                 plugin.set_setting('username', login_dialog.username)
                 if plugin.save_pass:
                     plugin.set_setting('password', webclient.encode(login_dialog.password))
                 else:
                     plugin.set_setting('password', '')
-            else:
-                plugin.log('ex.ua login error')
-                dialog.ok(_('Login error!'), _('Check your login and password, and try again.'))
         del login_dialog
-        plugin.log('Successful_login: {0}'.format(successful_login))
     if webclient.is_logged_in():
+        plugin.log('The user is logged in, getting bookmarks.')
         media = exua.get_media_list('/buffer')
         plugin.log('My bookmarks: {0}'.format(media))
         listing = _media_list('/buffer', media)

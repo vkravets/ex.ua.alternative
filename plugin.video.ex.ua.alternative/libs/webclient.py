@@ -31,6 +31,10 @@ class CookiesError(Exception):
     pass
 
 
+class LoginError(Exception):
+    pass
+
+
 def _load_cookie_jar():
     if os.path.exists(cookies_file):
         with open(cookies_file, 'rb') as fo:
@@ -99,9 +103,10 @@ def check_captcha():
     return captcha
 
 
-def login(username, password, captcha_value='', captcha_id=''):
+def login(username, password, captcha_id='', captcha_value=''):
     """
-    Send loging data to ex.ua. Returns True on successful login.
+    Send loging data to ex.ua.
+    Raises LoginError if login is not successful
     """
     login_data = {
         'login': username,
@@ -109,11 +114,12 @@ def login(username, password, captcha_value='', captcha_id=''):
         'flag_permanent': '1',
         'flag_not_ip_assign': '1'
         }
-    if captcha_value:
-        login_data['captcha_value'] = captcha_value
+    if captcha_id:
         login_data['captcha_id'] = captcha_id
+        login_data['captcha_value'] = captcha_value
     result_page = load_page(LOGIN_URL, login_data)
-    return 'i_error.png' not in result_page
+    if 'i_error.png' in result_page:
+        raise LoginError
 
 
 def encode(clear):
