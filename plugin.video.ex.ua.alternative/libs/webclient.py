@@ -99,14 +99,14 @@ def check_captcha():
     return captcha
 
 
-def login(username, password, remember_user=True, captcha_value='', captcha_id=''):
+def login(username, password, captcha_value='', captcha_id=''):
     """
     Send loging data to ex.ua. Returns True on successful login.
     """
     login_data = {
         'login': username,
         'password': password,
-        'flag_permanent': '1' if remember_user else '0',
+        'flag_permanent': '1',
         'flag_not_ip_assign': '1'
         }
     if captcha_value:
