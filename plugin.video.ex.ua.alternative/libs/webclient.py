@@ -85,7 +85,7 @@ def is_logged_in():
 
 def check_captcha():
     """
-    Check if there is a captcha on a loging page. Returns a namedtuple
+    Check if there is a captcha on a login page. Returns a namedtuple
     with 'captcha_id' and 'image' elements.
     """
     web_page = load_page(LOGIN_URL)
